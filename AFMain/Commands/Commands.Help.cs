@@ -18,10 +18,17 @@ public partial class Commands
         if (!isConsole)
             AppendPlayerHelp(player, helpMessage);
 
-        // 管理员附加指令（末尾追加，避免遮挡玩家指令）
-        if (player.HasPermission("autofish.admin"))
-            AppendAdminHelp(player, helpMessage);
-
         player.SendMessage(helpMessage.ToString(), 193, 223, 186);
+    }
+
+    /// <summary>
+    ///     仅输出管理员帮助，用于 /afa 和控制台提示。
+    /// </summary>
+    private static void SendAdminHelpOnly(TSPlayer player)
+    {
+        var sb = new StringBuilder();
+        sb.Append("[自动钓鱼 - 管理员命令]");
+        AppendAdminHelp(player, sb);
+        player.SendMessage(sb.ToString(), 193, 223, 186);
     }
 }

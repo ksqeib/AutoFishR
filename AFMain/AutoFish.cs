@@ -101,6 +101,7 @@ public partial class AutoFish : TerrariaPlugin
         GetDataHandlers.PlayerUpdate.Register(OnPlayerUpdate);
         ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
         TShockAPI.Commands.ChatCommands.Add(new Command("autofish", Commands.Afs, "af", "autofish"));
+        TShockAPI.Commands.ChatCommands.Add(new Command("autofish.admin", Commands.Afa, "afa", "autofishadmin"));
     }
 
     /// <summary>
@@ -117,6 +118,7 @@ public partial class AutoFish : TerrariaPlugin
             GetDataHandlers.PlayerUpdate.UnRegister(OnPlayerUpdate);
             ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, ProjectAiUpdate);
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afs);
+            TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afa);
         }
 
         base.Dispose(disposing);

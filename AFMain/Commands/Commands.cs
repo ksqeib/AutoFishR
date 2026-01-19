@@ -22,6 +22,12 @@ public partial class Commands
 
         if (!AutoFish.Config.PluginEnabled) return;
 
+        if (isConsole)
+        {
+            player.SendInfoMessage("请使用 /afa 进行管理员命令。");
+            return;
+        }
+
         var playerData = AutoFish.PlayerData.GetOrCreatePlayerData(player.Name, AutoFish.CreateDefaultPlayerData);
 
         //消耗模式下的剩余时间记录
@@ -49,10 +55,32 @@ public partial class Commands
             if (HandlePlayerCommand(args, playerData, remainingMinutes))
                 return;
 
-        if (HandleAdminCommand(args))
-            return;
-
         HelpCmd(args.Player);
+    }
+
+    /// <summary>
+    ///     处理 /afa（管理员）指令入口。
+    /// </summary>
+    public static void Afa(CommandArgs args)
+    {
+        if (!AutoFish.Config.PluginEnabled) return;
+
+        var caller = args.Player ?? TSPlayer.Server;
+        if (!caller.HasPermission("autofish.admin"))
+        {
+            caller.SendErrorMessage("你没有权限使用管理员指令。");
+            return;
+        }
+
+        if (args.Parameters.Count == 0)
+        {
+            SendAdminHelpOnly(caller);
+            return;
+        }
+
+        if (HandleAdminCommand(args)) return;
+
+        SendAdminHelpOnly(caller);
     }
 
     /// <summary>

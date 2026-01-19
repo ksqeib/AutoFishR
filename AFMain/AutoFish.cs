@@ -63,7 +63,7 @@ public partial class AutoFish : TerrariaPlugin
                        canBlockMonster;
         var defaultSkipAnimation = Config.GlobalSkipFishingAnimation && Config.DefaultSkipFishingAnimation &&
                         canSkipAnimation;
-        var defaultProtectBait = Config.ProtectValuableBaitEnabled && Config.DefaultProtectValuableBaitEnabled &&
+        var defaultProtectBait = Config.GlobalProtectValuableBaitEnabled && Config.DefaultProtectValuableBaitEnabled &&
                       canProtectBait;
 
         return new AFPlayerData.ItemData

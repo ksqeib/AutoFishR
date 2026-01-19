@@ -32,7 +32,7 @@ public partial class AutoFish
                                 HasFeaturePermission(player, "autofish.filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
                                    HasFeaturePermission(player, "autofish.skipanimation");
-        var protectValuableBait = Config.ProtectValuableBaitEnabled &&
+        var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
                        HasFeaturePermission(player, "autofish.bait.protect");
 
         // 从数据表中获取与玩家名字匹配的配置项

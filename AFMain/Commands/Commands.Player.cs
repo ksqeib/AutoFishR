@@ -44,7 +44,7 @@ public partial class Commands
         if (AutoFish.Config.ExtraCatchItemIds.Count != 0)
             helpMessage.Append("\n/af loot -- 查看[c/F25055:额外渔获表]");
 
-        if (AutoFish.Config.ProtectValuableBaitEnabled && AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+        if (AutoFish.Config.GlobalProtectValuableBaitEnabled && AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
         {
             helpMessage.Append("\n/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]");
             helpMessage.Append("\n/af baitlist -- 查看贵重鱼饵列表");
@@ -150,7 +150,7 @@ public partial class Commands
                     args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipFishingAnimation ? "启用" : "禁用")}]跳过上鱼动画。");
                     return true;
                 case "bait":
-                    if (!AutoFish.Config.ProtectValuableBaitEnabled)
+                    if (!AutoFish.Config.GlobalProtectValuableBaitEnabled)
                     {
                         args.Player.SendWarningMessage("保护贵重鱼饵未在全局开启，无法切换。");
                         return true;

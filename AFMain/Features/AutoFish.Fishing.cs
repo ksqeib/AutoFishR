@@ -74,8 +74,18 @@ public partial class AutoFish
             //原版方法，获取物品啥的
             args.Projectile.FishingCheck();
 
-
             var catchId = args.Projectile.localAI[1];
+
+            if (Config.RandomLootEnabled)
+            {
+                catchId = Random.Shared.Next(1, ItemID.Count);
+            }
+
+            // 如果额外渔获有任何1个物品ID，则参与AI[1]
+            if (catchId == 0) //钓不到就给额外的
+                if (Config.ExtraCatchItemIds.Any())
+                    catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
+            //想给额外渔获加点怪物
 
             if (catchId < 0)
             {
@@ -103,20 +113,7 @@ public partial class AutoFish
                         continue;
                     }
                 }
-
-                //ai[1] = localAI[1]
-                // args.Projectile.ai[1] = catchId;
             }
-
-            if (Config.RandomLootEnabled)
-            {
-                catchId = Random.Shared.Next(1, ItemID.Count);
-            }
-
-            // 如果额外渔获有任何1个物品ID，则参与AI[1]
-            if (Config.ExtraCatchItemIds.Any())
-                if (catchId == 0) //钓不到就给额外的
-                    catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
 
             noCatch = catchId == 0;
             if (!noCatch)
@@ -133,11 +130,11 @@ public partial class AutoFish
         player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(args.Projectile, out var pull,
             out var baitUsed);
         if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug
-        //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];
+        //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];，必须调用此函数，否则杆子会爆一堆弹幕，并且鱼饵会全不见
         player.TPlayer.ItemCheck_CheckFishingBobber_PullBobber(args.Projectile, baitUsed);
         // 同步玩家背包
         player.SendData(PacketTypes.PlayerSlot, "", player.Index, locate);
-        
+
         // 原版给东西的代码，在kill函数，会把ai[1]给玩家
         // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
         player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);

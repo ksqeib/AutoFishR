@@ -67,7 +67,13 @@ internal class Configuration
 
         ExtraCatchItemIds = new List<int>
         {
-            // 29,3093,4345
+            5,//蘑菇
+            72,//银币
+            75,//坠落之星
+            276,//仙人掌
+            3093,//草药袋
+            4345,//蠕虫罐头
+            
         };
     }
 

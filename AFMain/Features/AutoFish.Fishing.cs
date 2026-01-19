@@ -14,14 +14,15 @@ public partial class AutoFish
     /// </summary>
     private void ProjectAiUpdate(ProjectileAiUpdateEventArgs args)
     {
-        if (args.Projectile.owner < 0) return;
-        if (args.Projectile.owner > Main.maxPlayers) return;
-        if (!args.Projectile.active) return;
-        if (!args.Projectile.bobber) return;
+        var hook = args.Projectile;
+        if (hook.owner < 0) return;
+        if (hook.owner > Main.maxPlayers) return;
+        if (!hook.active) return;
+        if (!hook.bobber) return;
         if (!Config.PluginEnabled) return;
         if (!Config.GlobalAutoFishFeatureEnabled) return;
 
-        var player = TShock.Players[args.Projectile.owner];
+        var player = TShock.Players[hook.owner];
         if (player == null) return;
         if (!player.Active) return;
 
@@ -44,17 +45,22 @@ public partial class AutoFish
         if (Config.GlobalConsumptionModeEnabled && !playerData.ConsumptionEnabled) return;
 
         //负数时候为咬钩倒计时，说明上鱼了
-        if (!(args.Projectile.ai[1] < 0)) return;
-        
+        if (!(hook.ai[1] < 0)) return;
+
         player.TPlayer.Fishing_GetBait(out var baitPower, out var baitType);
         if (baitType == 0) return; //没有鱼饵，不要继续
 
-        //松露虫 判断一下玩家是否在海边
-        if (baitType == 2673 && player.X / 16 == Main.oceanBG && player.Y / 16 == Main.oceanBG)
+        // 保护贵重鱼饵：将其移到背包末尾以避免被消耗
+        if (Config.ProtectValuableBaitEnabled && Config.ValuableBaitItemIds.Contains(baitType))
         {
-            args.Projectile.ai[1] = 0;
-            player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);
-            return;
+            if (Tools.TrySwapValuableBaitToBack(player, baitType, Config.ValuableBaitItemIds,
+                    out var fromSlot, out var toSlot))
+            {
+                player.SendData(PacketTypes.PlayerSlot, "", player.Index, fromSlot);
+                player.SendData(PacketTypes.PlayerSlot, "", player.Index, toSlot);
+                resetHook(hook);
+                return;
+            }
         }
 
         //修改钓鱼得到的东西
@@ -67,9 +73,9 @@ public partial class AutoFish
         {
             //61就是直接调用AI_061_FishingBobber
             //原版方法，获取物品啥的
-            args.Projectile.FishingCheck();
+            hook.FishingCheck();
 
-            var catchId = args.Projectile.localAI[1];
+            var catchId = hook.localAI[1];
 
             if (Config.RandomLootEnabled)
             {
@@ -99,55 +105,62 @@ public partial class AutoFish
                 }
             }
 
-            noCatch = catchId == 0;//是否空军
+            noCatch = catchId == 0; //是否空军
             if (noCatch) continue;
-            
-            args.Projectile.localAI[1] = catchId; //数值置回
+
+            hook.localAI[1] = catchId; //数值置回
             break; //抓到就不应该继续判断
         }
 
         if (noCatch)
         {
-            //清空进度
-            args.Projectile.localAI[1] = 0;
-            //原版岩浆类似逻辑，加点进度
-            args.Projectile.localAI[1] += 240f;
+            resetHook(hook);
             return; //没抓到，不抬杆
         }
 
         //设置为收杆状态
-        args.Projectile.ai[0] = 1.0f;
+        hook.ai[0] = 1.0f;
 
         // 让服务器扣饵料
         var locate = LocateBait(player, baitType);
-        player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(args.Projectile, out var pull,
+        player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(hook, out var pull,
             out var baitUsed);
         if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug
         //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];，必须调用此函数，否则杆子会爆一堆弹幕，并且鱼饵会全不见
-        player.TPlayer.ItemCheck_CheckFishingBobber_PullBobber(args.Projectile, baitUsed);
+        player.TPlayer.ItemCheck_CheckFishingBobber_PullBobber(hook, baitUsed);
         // 同步玩家背包
         player.SendData(PacketTypes.PlayerSlot, "", player.Index, locate);
 
         // 原版给东西的代码，在kill函数，会把ai[1]给玩家
         // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
-        player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);
+        player.SendData(PacketTypes.ProjectileNew, "", hook.whoAmI);
 
         if (!caughtMonster) //抓到怪物触发会导致刷鱼漂，这里是重新设置溅射物
         {
             var velocity = new Vector2(0, 0);
-            var pos = new Vector2(args.Projectile.position.X, args.Projectile.position.Y + 3);
+            var pos = new Vector2(hook.position.X, hook.position.Y + 3);
             var index = SpawnProjectile.NewProjectile(
-                Main.projectile[args.Projectile.whoAmI].GetProjectileSource_FromThis(),
-                pos, velocity, args.Projectile.type, 0, 0,
-                args.Projectile.owner);
+                Main.projectile[hook.whoAmI].GetProjectileSource_FromThis(),
+                pos, velocity, hook.type, 0, 0,
+                hook.owner);
             player.SendData(PacketTypes.ProjectileNew, "", index);
         }
 
         if (skipFishingAnimation)
         {
             //跳过上鱼动画
-            player.SendData(PacketTypes.ProjectileDestroy, "", args.Projectile.whoAmI);
+            player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
         }
+    }
+
+    public static void resetHook(Projectile projectile)
+    {
+        //设置成没上鱼，无状态
+        projectile.ai[1] = 0;
+        //清空进度
+        projectile.localAI[1] = 0;
+        //原版岩浆类似逻辑，加点进度
+        projectile.localAI[1] += 240f;
     }
 
     private static int LocateBait(TSPlayer player, int baitUsed)

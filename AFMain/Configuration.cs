@@ -14,19 +14,36 @@ internal class Configuration
     public static readonly string FilePath = Path.Combine(TShock.SavePath, "AutoFish.json");
 
     [JsonProperty("插件总开关", Order = -100)] public bool PluginEnabled { get; set; } = true;
-    [JsonProperty("全局自动钓鱼开关", Order = -99)] public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
-    [JsonProperty("全局Buff开关", Order = -98)] public bool GlobalBuffFeatureEnabled { get; set; } = true;
-    [JsonProperty("全局多钩钓鱼开关", Order = -97)] public bool GlobalMultiHookFeatureEnabled { get; set; } = true;
-    [JsonProperty("全局消耗模式开关", Order = -96)] public bool GlobalConsumptionModeEnabled { get; set; }
 
-    [JsonProperty("全局过滤不可堆叠物品", Order = -90)] public bool GlobalSkipNonStackableLoot { get; set; } = true;
-    [JsonProperty("默认过滤不可堆叠物品", Order = -89)] public bool DefaultSkipNonStackableLoot { get; set; } = true;
+    [JsonProperty("全局自动钓鱼开关", Order = -99)]
+    public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
+
+    [JsonProperty("全局Buff开关", Order = -98)]
+    public bool GlobalBuffFeatureEnabled { get; set; } = true;
+
+    [JsonProperty("全局多钩钓鱼开关", Order = -97)]
+    public bool GlobalMultiHookFeatureEnabled { get; set; } = true;
+
+    [JsonProperty("全局消耗模式开关", Order = -96)]
+    public bool GlobalConsumptionModeEnabled { get; set; }
+
+    [JsonProperty("全局过滤不可堆叠物品", Order = -90)]
+    public bool GlobalSkipNonStackableLoot { get; set; } = true;
+
+    [JsonProperty("默认过滤不可堆叠物品", Order = -89)]
+    public bool DefaultSkipNonStackableLoot { get; set; } = true;
 
     [JsonProperty("全局不钓怪物", Order = -88)] public bool GlobalBlockMonsterCatch { get; set; } = true;
     [JsonProperty("默认不钓怪物", Order = -87)] public bool DefaultBlockMonsterCatch { get; set; } = true;
 
-    [JsonProperty("全局跳过上鱼动画", Order = -86)] public bool GlobalSkipFishingAnimation { get; set; } = true;
-    [JsonProperty("默认跳过上鱼动画", Order = -85)] public bool DefaultSkipFishingAnimation { get; set; } = true;
+    [JsonProperty("全局跳过上鱼动画", Order = -86)]
+    public bool GlobalSkipFishingAnimation { get; set; } = true;
+
+    [JsonProperty("默认跳过上鱼动画", Order = -85)]
+    public bool DefaultSkipFishingAnimation { get; set; } = true;
+
+    [JsonProperty("保护贵重鱼饵", Order = -84)] public bool ProtectValuableBaitEnabled { get; set; } = true;
+    [JsonProperty("贵重鱼饵列表", Order = -83)] public List<int> ValuableBaitItemIds { get; set; } = new();
 
     [JsonProperty("额外渔获", Order = -1)] public List<int> ExtraCatchItemIds = new();
 
@@ -65,15 +82,31 @@ internal class Configuration
             2002, 2675, 2676, 3191, 3194
         };
 
+        ValuableBaitItemIds = new List<int>
+        {
+            2673, // 松露虫
+            1999, //帛斑蝶
+
+            2436, //蓝水母
+            2437, //绿水母
+            2438, //粉水母
+
+            2891, //金蝴蝶
+            4340, //金蜻蜓
+            2893, //金蚱蜢
+            4362, //金瓢虫
+            4419, //金水黾
+            2895, //金蠕虫
+        };
+
         ExtraCatchItemIds = new List<int>
         {
-            5,//蘑菇
-            72,//银币
-            75,//坠落之星
-            276,//仙人掌
-            3093,//草药袋
-            4345,//蠕虫罐头
-            
+            5, //蘑菇
+            72, //银币
+            75, //坠落之星
+            276, //仙人掌
+            3093, //草药袋
+            4345, //蠕虫罐头
         };
     }
 

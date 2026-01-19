@@ -18,6 +18,7 @@ public partial class Commands
     public static void Afs(CommandArgs args)
     {
         var player = args.Player;
+        var isConsole = !player.RealPlayer;
 
         if (!AutoFish.Config.PluginEnabled) return;
 
@@ -29,19 +30,24 @@ public partial class Commands
         if (args.Parameters.Count == 0)
         {
             HelpCmd(args.Player);
+            if (!isConsole)
+            {
+                if (!playerData.AutoFishEnabled)
+                    args.Player.SendSuccessMessage("请输入该指令开启→: [c/92C5EC:/af fish]");
 
-            if (!playerData.AutoFishEnabled)
-                args.Player.SendSuccessMessage("请输入该指令开启→: [c/92C5EC:/af fish]");
+                //开启了消耗模式
+                else if (playerData.ConsumptionEnabled)
+                    args.Player.SendMessage($"自动钓鱼[c/46C4D4:剩余时长]：[c/F3F292:{Math.Floor(remainingMinutes)}]分钟", 243,
+                        181,
+                        145);
+            }
 
-            //开启了消耗模式
-            else if (playerData.ConsumptionEnabled)
-                args.Player.SendMessage($"自动钓鱼[c/46C4D4:剩余时长]：[c/F3F292:{Math.Floor(remainingMinutes)}]分钟", 243, 181,
-                    145);
             return;
         }
 
-        if (HandlePlayerCommand(args, playerData, remainingMinutes))
-            return;
+        if (!isConsole)
+            if (HandlePlayerCommand(args, playerData, remainingMinutes))
+                return;
 
         if (HandleAdminCommand(args))
             return;

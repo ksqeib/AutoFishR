@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using Terraria;
 using TShockAPI;
@@ -53,7 +51,6 @@ public class Tools
         }
 
         if (targetSlot == -1)
-        {
             for (var i = inv.Length - 1; i >= 0; i--)
             {
                 if (inv[i].bait <= 0 || i == currentSlot) continue;
@@ -61,7 +58,6 @@ public class Tools
                 targetItemType = inv[i].type;
                 break;
             }
-        }
 
         if (targetSlot == -1 || targetSlot == currentSlot) return false;
 

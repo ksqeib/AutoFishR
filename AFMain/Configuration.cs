@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using TShockAPI;
 
 namespace AutoFish.AFMain;
@@ -13,26 +11,31 @@ internal class Configuration
     /// <summary>配置文件路径。</summary>
     public static readonly string FilePath = Path.Combine(TShock.SavePath, "AutoFish.json");
 
+    [JsonProperty("额外渔获", Order = 24)] public List<int> ExtraCatchItemIds = new();
+
     [JsonProperty("插件总开关", Order = 1)] public bool PluginEnabled { get; set; } = true;
 
     [JsonProperty("全局自动钓鱼开关", Order = 2)] public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
-    [JsonProperty("默认自动钓鱼开关", Order = 3)] public bool DefaultAutoFishEnabled { get; set; } = false;
+    [JsonProperty("默认自动钓鱼开关", Order = 3)] public bool DefaultAutoFishEnabled { get; set; }
 
     [JsonProperty("全局Buff开关", Order = 4)] public bool GlobalBuffFeatureEnabled { get; set; } = true;
-    [JsonProperty("默认Buff开关", Order = 5)] public bool DefaultBuffEnabled { get; set; } = false;
+    [JsonProperty("默认Buff开关", Order = 5)] public bool DefaultBuffEnabled { get; set; }
 
     [JsonProperty("全局多钩钓鱼开关", Order = 6)] public bool GlobalMultiHookFeatureEnabled { get; set; } = true;
     [JsonProperty("多钩上限", Order = 7)] public int GlobalMultiHookMaxNum { get; set; } = 5;
-    [JsonProperty("默认多钩开关", Order = 8)] public bool DefaultMultiHookEnabled { get; set; } = false;
+    [JsonProperty("默认多钩开关", Order = 8)] public bool DefaultMultiHookEnabled { get; set; }
 
     [JsonProperty("全局消耗模式开关", Order = 9)] public bool GlobalConsumptionModeEnabled { get; set; }
-    [JsonProperty("默认消耗模式", Order = 10)] public bool DefaultConsumptionEnabled { get; set; } = false;
+    [JsonProperty("默认消耗模式", Order = 10)] public bool DefaultConsumptionEnabled { get; set; }
     [JsonProperty("消耗数量", Order = 11)] public int BaitConsumeCount { get; set; } = 10;
     [JsonProperty("奖励时长", Order = 12)] public int RewardDurationMinutes { get; set; } = 12;
     [JsonProperty("消耗物品", Order = 13)] public List<int> BaitItemIds { get; set; } = new();
 
-    [JsonProperty("全局过滤不可堆叠物品", Order = 14)] public bool GlobalSkipNonStackableLoot { get; set; } = true;
-    [JsonProperty("默认过滤不可堆叠物品", Order = 15)] public bool DefaultSkipNonStackableLoot { get; set; } = true;
+    [JsonProperty("全局过滤不可堆叠物品", Order = 14)]
+    public bool GlobalSkipNonStackableLoot { get; set; } = true;
+
+    [JsonProperty("默认过滤不可堆叠物品", Order = 15)]
+    public bool DefaultSkipNonStackableLoot { get; set; } = true;
 
     [JsonProperty("全局不钓怪物", Order = 16)] public bool GlobalBlockMonsterCatch { get; set; } = true;
     [JsonProperty("默认不钓怪物", Order = 17)] public bool DefaultBlockMonsterCatch { get; set; } = true;
@@ -45,8 +48,6 @@ internal class Configuration
     [JsonProperty("贵重鱼饵列表", Order = 22)] public List<int> ValuableBaitItemIds { get; set; } = new();
 
     [JsonProperty("随机物品", Order = 23)] public bool RandomLootEnabled { get; set; }
-
-    [JsonProperty("额外渔获", Order = 24)] public List<int> ExtraCatchItemIds = new();
 
     [JsonProperty("Buff表", Order = 25)] public Dictionary<int, int> BuffDurations { get; set; } = new();
 
@@ -84,7 +85,7 @@ internal class Configuration
             2893, //金蚱蜢
             4362, //金瓢虫
             4419, //金水黾
-            2895, //金蠕虫
+            2895 //金蠕虫
         };
 
         DefaultProtectValuableBaitEnabled = true;
@@ -96,7 +97,7 @@ internal class Configuration
             75, //坠落之星
             276, //仙人掌
             3093, //草药袋
-            4345, //蠕虫罐头
+            4345 //蠕虫罐头
         };
     }
 

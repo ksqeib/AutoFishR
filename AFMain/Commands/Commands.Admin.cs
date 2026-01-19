@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 using TShockAPI;
 
@@ -42,7 +41,6 @@ public partial class Commands
         var sub = args.Parameters[0].ToLower();
 
         if (args.Parameters.Count == 1)
-        {
             switch (sub)
             {
                 case "multi":
@@ -68,17 +66,20 @@ public partial class Commands
                     return true;
                 case "stack":
                     AutoFish.Config.GlobalSkipNonStackableLoot = !AutoFish.Config.GlobalSkipNonStackableLoot;
-                    caller.SendSuccessMessage($"已[c/92C5EC:{(AutoFish.Config.GlobalSkipNonStackableLoot ? "启用" : "禁用")}]全局过滤不可堆叠渔获。");
+                    caller.SendSuccessMessage(
+                        $"已[c/92C5EC:{(AutoFish.Config.GlobalSkipNonStackableLoot ? "启用" : "禁用")}]全局过滤不可堆叠渔获。");
                     AutoFish.Config.Write();
                     return true;
                 case "monster":
                     AutoFish.Config.GlobalBlockMonsterCatch = !AutoFish.Config.GlobalBlockMonsterCatch;
-                    caller.SendSuccessMessage($"已[c/92C5EC:{(AutoFish.Config.GlobalBlockMonsterCatch ? "启用" : "禁用")}]全局不钓怪物。");
+                    caller.SendSuccessMessage(
+                        $"已[c/92C5EC:{(AutoFish.Config.GlobalBlockMonsterCatch ? "启用" : "禁用")}]全局不钓怪物。");
                     AutoFish.Config.Write();
                     return true;
                 case "anim":
                     AutoFish.Config.GlobalSkipFishingAnimation = !AutoFish.Config.GlobalSkipFishingAnimation;
-                    caller.SendSuccessMessage($"已[c/92C5EC:{(AutoFish.Config.GlobalSkipFishingAnimation ? "启用" : "禁用")}]全局跳过上鱼动画。");
+                    caller.SendSuccessMessage(
+                        $"已[c/92C5EC:{(AutoFish.Config.GlobalSkipFishingAnimation ? "启用" : "禁用")}]全局跳过上鱼动画。");
                     AutoFish.Config.Write();
                     return true;
                 case "set":
@@ -90,7 +91,6 @@ public partial class Commands
                 default:
                     return false;
             }
-        }
 
         if (args.Parameters.Count == 2)
         {

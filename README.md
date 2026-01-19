@@ -11,41 +11,42 @@
 - 配备完整的指令系统:管理与玩家可见的菜单指令是不一样的
 - 甚至有些功能没开启是不会显示相关指令的
 - 先前的仓库 https://github.com/ksqeib/AutoFish-old
+
 ## 指令
 
 玩家指令（命令 `/af` 及别名 `/autofish`）：
 
-| 命令 | 权限 | 说明 |
-| --- | --- | --- |
-| /af | autofish | 查看菜单/帮助。 |
-| /af status | autofish | 查看个人状态。 |
-| /af fish | autofish.fish | 开关个人自动钓鱼。 |
-| /af buff | autofish.buff | 开关个人钓鱼BUFF（需全局BUFF开启）。 |
-| /af multi | autofish.multihook | 开关个人多钩（需全局多钩开启）。 |
-| /af hook 数字 | autofish.multihook | 设置个人钩子上限（不超过全局多钩上限，需全局多钩开启）。 |
-| /af stack | autofish.filter.unstackable | 开关过滤不可堆叠渔获（需全局过滤开启）。 |
-| /af monster | autofish.filter.monster | 开关不钓怪物（需全局不钓怪开启）。 |
-| /af anim | autofish.skipanimation | 开关跳过上鱼动画（需全局动画跳过开启）。 |
-| /af list | autofish | 列出消耗模式指定物品表（需全局消耗模式开启）。 |
-| /af loot | autofish | 查看额外渔获表（需配置存在额外渔获）。 |
+| 命令          | 权限                          | 说明                           |
+|-------------|-----------------------------|------------------------------|
+| /af         | autofish                    | 查看菜单/帮助。                     |
+| /af status  | autofish                    | 查看个人状态。                      |
+| /af fish    | autofish.fish               | 开关个人自动钓鱼。                    |
+| /af buff    | autofish.buff               | 开关个人钓鱼BUFF（需全局BUFF开启）。       |
+| /af multi   | autofish.multihook          | 开关个人多钩（需全局多钩开启）。             |
+| /af hook 数字 | autofish.multihook          | 设置个人钩子上限（不超过全局多钩上限，需全局多钩开启）。 |
+| /af stack   | autofish.filter.unstackable | 开关过滤不可堆叠渔获（需全局过滤开启）。         |
+| /af monster | autofish.filter.monster     | 开关不钓怪物（需全局不钓怪开启）。            |
+| /af anim    | autofish.skipanimation      | 开关跳过上鱼动画（需全局动画跳过开启）。         |
+| /af list    | autofish                    | 列出消耗模式指定物品表（需全局消耗模式开启）。      |
+| /af loot    | autofish                    | 查看额外渔获表（需配置存在额外渔获）。          |
 
 管理员指令（需权限 `autofish.admin`）：
 
-| 命令 | 说明 |
-| --- | --- |
-| /af gbuff | 开关全局钓鱼BUFF。 |
-| /af gmore | 开关全局多线模式。 |
-| /af gduo 数字 | 设置全局多线钩子上限（需全局多钩开启）。 |
-| /af gmod | 开关全局消耗模式。 |
-| /af gset 数量 | 设置消耗物品数量要求（需全局消耗模式开启）。 |
-| /af gtime 数字 | 设置自动时长（分钟，需全局消耗模式开启）。 |
-| /af gadd 物品名 | 添加指定鱼饵（需全局消耗模式开启）。 |
-| /af gdel 物品名 | 移除指定鱼饵（需全局消耗模式开启）。 |
-| /af gaddloot 物品名 | 添加额外渔获。 |
-| /af gdelloot 物品名 | 移除额外渔获。 |
-| /af gstack | 开关全局过滤不可堆叠渔获。 |
-| /af gmonster | 开关全局不钓怪物。 |
-| /af gani | 开关全局跳过上鱼动画。 |
+| 命令               | 说明                     |
+|------------------|------------------------|
+| /af gbuff        | 开关全局钓鱼BUFF。            |
+| /af gmore        | 开关全局多线模式。              |
+| /af gduo 数字      | 设置全局多线钩子上限（需全局多钩开启）。   |
+| /af gmod         | 开关全局消耗模式。              |
+| /af gset 数量      | 设置消耗物品数量要求（需全局消耗模式开启）。 |
+| /af gtime 数字     | 设置自动时长（分钟，需全局消耗模式开启）。  |
+| /af gadd 物品名     | 添加指定鱼饵（需全局消耗模式开启）。     |
+| /af gdel 物品名     | 移除指定鱼饵（需全局消耗模式开启）。     |
+| /af gaddloot 物品名 | 添加额外渔获。                |
+| /af gdelloot 物品名 | 移除额外渔获。                |
+| /af gstack       | 开关全局过滤不可堆叠渔获。          |
+| /af gmonster     | 开关全局不钓怪物。              |
+| /af gani         | 开关全局跳过上鱼动画。            |
 
 其他：`/reload`（tshock.cfg.reload）重载配置。
 
@@ -142,8 +143,10 @@
 - 大概率看不到但是也可以：国内社区trhub.cn ，bbstr.net , tr.monika.love
 
 ## 已知问题
+
 - 非SSC服务器不扣鱼饵
 
 ## TODO
+
 - 渔获概率可配置，不均等概率
 - 添加额外的可钓上来的敌怪

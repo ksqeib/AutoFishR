@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using AutoFish.Data;
+﻿using AutoFish.Data;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -58,13 +56,13 @@ public partial class AutoFish : TerrariaPlugin
         var defaultMulti = Config.DefaultMultiHookEnabled && canMulti;
         var defaultConsumption = Config.DefaultConsumptionEnabled;
         var defaultSkipNonStackable = Config.GlobalSkipNonStackableLoot && Config.DefaultSkipNonStackableLoot &&
-                           canSkipNonStackable;
+                                      canSkipNonStackable;
         var defaultBlockMonster = Config.GlobalBlockMonsterCatch && Config.DefaultBlockMonsterCatch &&
-                       canBlockMonster;
+                                  canBlockMonster;
         var defaultSkipAnimation = Config.GlobalSkipFishingAnimation && Config.DefaultSkipFishingAnimation &&
-                        canSkipAnimation;
+                                   canSkipAnimation;
         var defaultProtectBait = Config.GlobalProtectValuableBaitEnabled && Config.DefaultProtectValuableBaitEnabled &&
-                      canProtectBait;
+                                 canProtectBait;
 
         return new AFPlayerData.ItemData
         {

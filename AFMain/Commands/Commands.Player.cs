@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Text;
 using AutoFish.Data;
 using TShockAPI;
@@ -23,19 +21,22 @@ public partial class Commands
         if (AutoFish.Config.GlobalBuffFeatureEnabled && AutoFish.HasFeaturePermission(player, "autofish.buff"))
             helpMessage.Append("\n/af buff -- 开启丨关闭[c/F6B152:钓鱼BUFF]");
 
-        if (AutoFish.Config.GlobalMultiHookFeatureEnabled && AutoFish.HasFeaturePermission(player, "autofish.multihook"))
+        if (AutoFish.Config.GlobalMultiHookFeatureEnabled &&
+            AutoFish.HasFeaturePermission(player, "autofish.multihook"))
         {
             helpMessage.Append("\n/af multi -- 开启丨关闭[c/87DF86:多钩功能]");
             helpMessage.Append("\n/af hook 数字 -- 设置个人钩子上限 (<= 全局上限)");
         }
 
-        if (AutoFish.Config.GlobalSkipNonStackableLoot && AutoFish.HasFeaturePermission(player, "autofish.filter.unstackable"))
+        if (AutoFish.Config.GlobalSkipNonStackableLoot &&
+            AutoFish.HasFeaturePermission(player, "autofish.filter.unstackable"))
             helpMessage.Append("\n/af stack -- 开启丨关闭[c/F4C17F:过滤不可堆叠渔获]");
 
         if (AutoFish.Config.GlobalBlockMonsterCatch && AutoFish.HasFeaturePermission(player, "autofish.filter.monster"))
             helpMessage.Append("\n/af monster -- 开启丨关闭[c/F48FB1:不钓怪物]");
 
-        if (AutoFish.Config.GlobalSkipFishingAnimation && AutoFish.HasFeaturePermission(player, "autofish.skipanimation"))
+        if (AutoFish.Config.GlobalSkipFishingAnimation &&
+            AutoFish.HasFeaturePermission(player, "autofish.skipanimation"))
             helpMessage.Append("\n/af anim -- 开启丨关闭[c/8EC4F4:跳过上鱼动画]");
 
         if (AutoFish.Config.GlobalConsumptionModeEnabled)
@@ -44,7 +45,8 @@ public partial class Commands
         if (AutoFish.Config.ExtraCatchItemIds.Count != 0)
             helpMessage.Append("\n/af loot -- 查看[c/F25055:额外渔获表]");
 
-        if (AutoFish.Config.GlobalProtectValuableBaitEnabled && AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+        if (AutoFish.Config.GlobalProtectValuableBaitEnabled &&
+            AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
         {
             helpMessage.Append("\n/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]");
             helpMessage.Append("\n/af baitlist -- 查看贵重鱼饵列表");
@@ -57,7 +59,6 @@ public partial class Commands
         var sub = args.Parameters[0].ToLower();
 
         if (args.Parameters.Count == 1)
-        {
             switch (sub)
             {
                 case "fish":
@@ -69,7 +70,8 @@ public partial class Commands
 
                     var fishEnabled = playerData.AutoFishEnabled;
                     playerData.AutoFishEnabled = !fishEnabled;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(fishEnabled ? "禁用" : "启用")}]自动钓鱼功能。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(fishEnabled ? "禁用" : "启用")}]自动钓鱼功能。");
                     return true;
                 case "buff":
                     if (!AutoFish.HasFeaturePermission(player, "autofish.buff"))
@@ -80,7 +82,8 @@ public partial class Commands
 
                     var isEnabled = playerData.BuffEnabled;
                     playerData.BuffEnabled = !isEnabled;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(isEnabled ? "禁用" : "启用")}]自动钓鱼BUFF");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(isEnabled ? "禁用" : "启用")}]自动钓鱼BUFF");
                     return true;
                 case "multi":
                     if (!AutoFish.HasFeaturePermission(player, "autofish.multihook"))
@@ -96,7 +99,8 @@ public partial class Commands
                     }
 
                     playerData.MultiHookEnabled = !playerData.MultiHookEnabled;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.MultiHookEnabled ? "启用" : "禁用")}]多钩功能。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.MultiHookEnabled ? "启用" : "禁用")}]多钩功能。");
                     return true;
                 case "status":
                     SendStatus(args.Player, playerData, remainingMinutes);
@@ -115,7 +119,8 @@ public partial class Commands
                     }
 
                     playerData.SkipNonStackableLoot = !playerData.SkipNonStackableLoot;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipNonStackableLoot ? "启用" : "禁用")}]过滤不可堆叠渔获。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipNonStackableLoot ? "启用" : "禁用")}]过滤不可堆叠渔获。");
                     return true;
                 case "monster":
                     if (!AutoFish.Config.GlobalBlockMonsterCatch)
@@ -131,7 +136,8 @@ public partial class Commands
                     }
 
                     playerData.BlockMonsterCatch = !playerData.BlockMonsterCatch;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.BlockMonsterCatch ? "启用" : "禁用")}]不钓怪物。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.BlockMonsterCatch ? "启用" : "禁用")}]不钓怪物。");
                     return true;
                 case "anim":
                     if (!AutoFish.Config.GlobalSkipFishingAnimation)
@@ -147,7 +153,8 @@ public partial class Commands
                     }
 
                     playerData.SkipFishingAnimation = !playerData.SkipFishingAnimation;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipFishingAnimation ? "启用" : "禁用")}]跳过上鱼动画。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipFishingAnimation ? "启用" : "禁用")}]跳过上鱼动画。");
                     return true;
                 case "bait":
                     if (!AutoFish.Config.GlobalProtectValuableBaitEnabled)
@@ -163,7 +170,8 @@ public partial class Commands
                     }
 
                     playerData.ProtectValuableBaitEnabled = !playerData.ProtectValuableBaitEnabled;
-                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.ProtectValuableBaitEnabled ? "启用" : "禁用")}]保护贵重鱼饵。");
+                    args.Player.SendSuccessMessage(
+                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.ProtectValuableBaitEnabled ? "启用" : "禁用")}]保护贵重鱼饵。");
                     return true;
                 case "baitlist":
                     if (!AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
@@ -197,10 +205,8 @@ public partial class Commands
                 default:
                     return false;
             }
-        }
 
         if (args.Parameters.Count == 2)
-        {
             switch (sub)
             {
                 case "hook":
@@ -235,12 +241,12 @@ public partial class Commands
                     }
 
                     playerData.HookMaxNum = personalMax;
-                    args.Player.SendSuccessMessage($"已将个人钩子上限设置为：{personalMax} (全局上限 {AutoFish.Config.GlobalMultiHookMaxNum})");
+                    args.Player.SendSuccessMessage(
+                        $"已将个人钩子上限设置为：{personalMax} (全局上限 {AutoFish.Config.GlobalMultiHookMaxNum})");
                     return true;
                 default:
                     return false;
             }
-        }
 
         return false;
     }

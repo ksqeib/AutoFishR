@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using System.Text;
 using AutoFish.Data;
-using Terraria;
 using TShockAPI;
 
 namespace AutoFish.AFMain;

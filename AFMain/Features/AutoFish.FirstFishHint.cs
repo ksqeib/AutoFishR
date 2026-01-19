@@ -1,4 +1,3 @@
-using AutoFish.Data;
 using Terraria;
 using TShockAPI;
 

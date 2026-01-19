@@ -33,7 +33,7 @@ public partial class AutoFish
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
                                    HasFeaturePermission(player, "autofish.skipanimation");
         var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
-                       HasFeaturePermission(player, "autofish.bait.protect");
+                                  HasFeaturePermission(player, "autofish.bait.protect");
 
         // 从数据表中获取与玩家名字匹配的配置项
         var playerData = PlayerData.GetOrCreatePlayerData(player.Name, CreateDefaultPlayerData);
@@ -55,7 +55,6 @@ public partial class AutoFish
 
         // 保护贵重鱼饵：将其移到背包末尾以避免被消耗
         if (protectValuableBait && Config.ValuableBaitItemIds.Contains(baitType))
-        {
             if (Tools.TrySwapValuableBaitToBack(player, baitType, Config.ValuableBaitItemIds,
                     out var fromSlot, out var toSlot, out var fromType, out var toType))
             {
@@ -68,7 +67,6 @@ public partial class AutoFish
                 resetHook(hook);
                 return;
             }
-        }
 
         //修改钓鱼得到的东西
         //获得钓鱼物品方法
@@ -83,10 +81,7 @@ public partial class AutoFish
 
             var catchId = hook.localAI[1];
 
-            if (Config.RandomLootEnabled)
-            {
-                catchId = Random.Shared.Next(1, ItemID.Count);
-            }
+            if (Config.RandomLootEnabled) catchId = Random.Shared.Next(1, ItemID.Count);
 
             // 如果额外渔获有任何1个物品ID，则参与AI[1]
             if (catchId == 0) //钓不到就给额外的
@@ -102,14 +97,12 @@ public partial class AutoFish
 
             // 怪物生成使用localAI[1]，而物品则使用ai[1]，小于0情况无需处理，是刷血月怪
             if (catchId > 0) //抓到物品
-            {
                 if (skipNonStackableLoot) //不想抓不可堆叠堆叠物品
                 {
                     var item = new Item();
                     item.SetDefaults((int)catchId);
                     if (item.maxStack == 1) continue;
                 }
-            }
 
             noCatch = catchId == 0; //是否空军
             if (noCatch) continue;
@@ -153,10 +146,8 @@ public partial class AutoFish
         }
 
         if (skipFishingAnimation)
-        {
             //跳过上鱼动画
             player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
-        }
     }
 
     public static void resetHook(Projectile projectile)

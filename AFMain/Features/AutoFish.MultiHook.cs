@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using AutoFish.Utils;
 using Terraria;
 using TShockAPI;
@@ -32,7 +30,7 @@ public partial class AutoFish
         if (Config.GlobalConsumptionModeEnabled && !playerData.ConsumptionEnabled) return;
         // 检查是否上钩
         if (!Tools.BobbersActive(args.Owner)) return;
-        
+
         var index = SpawnProjectile.NewProjectile(Main.projectile[args.Index].GetProjectileSource_FromThis(),
             args.Position, args.Velocity, args.Type, args.Damage, args.Knockback, args.Owner, 0, 0, 0, -1, guid);
         player.SendData(PacketTypes.ProjectileNew, "", index);

@@ -43,19 +43,14 @@ public partial class AutoFish
         // 正常状态下与消耗模式下启用自动钓鱼
         if (Config.GlobalConsumptionModeEnabled && !playerData.ConsumptionEnabled) return;
 
-        //检测是不是生成，是生成boss就不钓起来
+        //负数时候为咬钩倒计时，说明上鱼了
         if (!(args.Projectile.ai[1] < 0)) return;
-
-        args.Projectile.ai[0] = 1.0f;
-
-        var fishingConditions = player.TPlayer.GetFishingConditions();
-        if (fishingConditions.BaitItemType == 0) //没有鱼饵，不要继续
-        {
-            return;
-        }
+        
+        player.TPlayer.Fishing_GetBait(out var baitPower, out var baitType);
+        if (baitType == 0) return; //没有鱼饵，不要继续
 
         //松露虫 判断一下玩家是否在海边
-        if (fishingConditions.BaitItemType == 2673 && player.X / 16 == Main.oceanBG && player.Y / 16 == Main.oceanBG)
+        if (baitType == 2673 && player.X / 16 == Main.oceanBG && player.Y / 16 == Main.oceanBG)
         {
             args.Projectile.ai[1] = 0;
             player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);
@@ -87,46 +82,44 @@ public partial class AutoFish
                     catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
             //想给额外渔获加点怪物
 
-            if (catchId < 0)
+            if (catchId < 0) //抓到怪物
             {
-                if (blockMonsterCatch)
-                {
-                    catchId = 0;
-                    args.Projectile.localAI[1] = 0;
-                    continue;
-                }
-
+                if (blockMonsterCatch) continue; //不想抓怪物
                 caughtMonster = true;
             }
 
             // 怪物生成使用localAI[1]，而物品则使用ai[1]，小于0情况无需处理，是刷血月怪
-            if (catchId > 0)
+            if (catchId > 0) //抓到物品
             {
-                if (skipNonStackableLoot)
+                if (skipNonStackableLoot) //不想抓不可堆叠堆叠物品
                 {
                     var item = new Item();
                     item.SetDefaults((int)catchId);
-                    if (item.maxStack == 1)
-                    {
-                        catchId = 0;
-                        args.Projectile.localAI[1] = 0;
-                        continue;
-                    }
+                    if (item.maxStack == 1) continue;
                 }
             }
 
-            noCatch = catchId == 0;
-            if (!noCatch)
-            {
-                args.Projectile.localAI[1] = catchId; //数值置回
-                break; //抓到就不应该继续判断
-            }
+            noCatch = catchId == 0;//是否空军
+            if (noCatch) continue;
+            
+            args.Projectile.localAI[1] = catchId; //数值置回
+            break; //抓到就不应该继续判断
         }
 
-        if (noCatch) return; //没抓到，不抬杆
+        if (noCatch)
+        {
+            //清空进度
+            args.Projectile.localAI[1] = 0;
+            //原版岩浆类似逻辑，加点进度
+            args.Projectile.localAI[1] += 240f;
+            return; //没抓到，不抬杆
+        }
+
+        //设置为收杆状态
+        args.Projectile.ai[0] = 1.0f;
 
         // 让服务器扣饵料
-        var locate = LocateBait(player, fishingConditions.BaitItemType);
+        var locate = LocateBait(player, baitType);
         player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(args.Projectile, out var pull,
             out var baitUsed);
         if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug

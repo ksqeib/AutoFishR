@@ -1,113 +1,93 @@
 # AutoFishR 自动钓鱼重制版
 
 - 作者: ksqeib 羽学 少司命
-- 出处: 无
-- 这是一个Tshock服务器插件，主要用于：
-- 自动钓鱼，当插件开启时受渔力与鱼饵力影响，
-- 当没钓到鱼时，会得到【额外渔获】里的物品
-- 可通过配置文件调整鱼钩数量，
-- 消耗指定物品来换取插件使用时长，
-- 还可以自定义配置钓鱼的额外物品。
-- 配备完整的指令系统:管理与玩家可见的菜单指令是不一样的
-- 甚至有些功能没开启是不会显示相关指令的
-- 先前的仓库 https://github.com/ksqeib/AutoFish-old
+- 说明: Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外渔获、消耗模式等，可按权限与全局开关动态显隐指令。
+- 历史仓库: https://github.com/ksqeib/AutoFish-old
 
-## 指令
+## 权限模型（重要）
 
-玩家指令（命令 `/af` 及别名 `/autofish`）：
+- 管理员全通: `autofish.admin`。
+- 通用白名单: `autofish.common`，拥有它即可使用全部玩家指令（仍受全局开关与负权限影响）。
+- 功能权限: `autofish.<feature>`，示例 `autofish.fish`、`autofish.multihook`、`autofish.filter.unstackable` 等。
+- 负权限: `autofish.no.<feature>`，拥有该权限即强制无权限（除 admin 外），示例 `autofish.no.fish`。
+- `/af` 命令本身需要 `autofish`；拥有 `autofish.common` 等同可用全部玩家指令。
 
-| 命令          | 权限                          | 说明                           |
-|-------------|-----------------------------|------------------------------|
-| /af         | autofish                    | 查看菜单/帮助。                     |
-| /af status  | autofish                    | 查看个人状态。                      |
-| /af fish    | autofish.fish               | 开关个人自动钓鱼。                    |
-| /af buff    | autofish.buff               | 开关个人钓鱼BUFF（需全局BUFF开启）。       |
-| /af multi   | autofish.multihook          | 开关个人多钩（需全局多钩开启）。             |
-| /af hook 数字 | autofish.multihook          | 设置个人钩子上限（不超过全局多钩上限，需全局多钩开启）。 |
-| /af stack   | autofish.filter.unstackable | 开关过滤不可堆叠渔获（需全局过滤开启）。         |
-| /af monster | autofish.filter.monster     | 开关不钓怪物（需全局不钓怪开启）。            |
-| /af anim    | autofish.skipanimation      | 开关跳过上鱼动画（需全局动画跳过开启）。         |
-| /af list    | autofish                    | 列出消耗模式指定物品表（需全局消耗模式开启）。      |
-| /af loot    | autofish                    | 查看额外渔获表（需配置存在额外渔获）。          |
+示例：
+- 想让默认组能用除钓鱼外的所有功能，可给 default 组添加 `autofish.common`，再添加 `autofish.no.fish`，这样普通玩家可用 BUFF/多钩等，但无法开启自动钓鱼。
 
-管理员指令（需权限 `autofish.admin`）：
+## 玩家指令（/af, /autofish）
 
-| 命令               | 说明                     |
-|------------------|------------------------|
-| /af gbuff        | 开关全局钓鱼BUFF。            |
-| /af gmore        | 开关全局多线模式。              |
-| /af gduo 数字      | 设置全局多线钩子上限（需全局多钩开启）。   |
-| /af gmod         | 开关全局消耗模式。              |
-| /af gset 数量      | 设置消耗物品数量要求（需全局消耗模式开启）。 |
-| /af gtime 数字     | 设置自动时长（分钟，需全局消耗模式开启）。  |
-| /af gadd 物品名     | 添加指定鱼饵（需全局消耗模式开启）。     |
-| /af gdel 物品名     | 移除指定鱼饵（需全局消耗模式开启）。     |
-| /af gaddloot 物品名 | 添加额外渔获。                |
-| /af gdelloot 物品名 | 移除额外渔获。                |
-| /af gstack       | 开关全局过滤不可堆叠渔获。          |
-| /af gmonster     | 开关全局不钓怪物。              |
-| /af gani         | 开关全局跳过上鱼动画。            |
+| 命令 | 说明 | 所需权限 | 其他前置 |
+| --- | --- | --- | --- |
+| /af | 查看菜单/帮助 | autofish | 插件开启 |
+| /af status | 查看个人状态 | autofish |  |
+| /af fish | 开/关自动钓鱼 | autofish.fish | 全局自动钓鱼开启 |
+| /af buff | 开/关钓鱼 Buff | autofish.buff | 全局 Buff 开启 |
+| /af multi | 开/关多钩 | autofish.multihook | 全局多钩开启 |
+| /af hook 数字 | 设置个人钩子上限 | autofish.multihook | 全局多钩开启，数值 ≤ 全局上限 |
+| /af stack | 开/关过滤不可堆叠 | autofish.filter.unstackable | 全局过滤开启 |
+| /af monster | 开/关不钓怪物 | autofish.filter.monster | 全局不钓怪开启 |
+| /af anim | 开/关跳过上鱼动画 | autofish.skipanimation | 全局动画跳过开启 |
+| /af list | 查看消耗模式指定物品 | autofish | 全局消耗模式开启 |
+| /af loot | 查看额外渔获表 | autofish | 需配置额外渔获列表非空 |
+| /af bait | 开/关保护贵重鱼饵 | autofish.bait.protect | 全局保护贵重鱼饵开启 |
+| /af baitlist | 查看贵重鱼饵列表 | autofish.bait.protect | 同上 |
 
-其他：`/reload`（tshock.cfg.reload）重载配置。
+> 负权限优先：拥有 `autofish.no.<feature>` 时，除 admin 外一律视为无权。
 
----
-配置注意事项
----
-1.本插件的权限名为`autofish` 你可以输入 `/group addperm default autofish`给玩家添加权限
+## 管理员指令（/afa, /autofishadmin）
 
-2.`消耗模式`消耗物品来换取自动钓鱼使用时长。
+全部指令需 `autofish.admin`。
 
-3.`多钩钓鱼`为自动钓鱼开启连发模式，让钓鱼效率更高，`多钩上限`定义最多可以多少鱼钩同时自动钓
+| 命令 | 说明 |
+| --- | --- |
+| /afa | 查看管理员帮助菜单 |
+| /afa buff | 全局开/关钓鱼 Buff |
+| /afa multi | 全局开/关多线模式 |
+| /afa duo 数字 | 设置全局多钩上限 |
+| /afa mod | 全局开/关消耗模式 |
+| /afa set 数量 | 设置消耗物品数量（消耗模式开启时生效） |
+| /afa time 数字 | 设置奖励时长（分钟，消耗模式开启时生效） |
+| /afa add 物品名 | 添加指定鱼饵（消耗模式开启时可见） |
+| /afa del 物品名 | 移除指定鱼饵（消耗模式开启时可见） |
+| /afa addloot 物品名 | 添加额外渔获 |
+| /afa delloot 物品名 | 移除额外渔获 |
+| /afa stack | 全局开/关过滤不可堆叠渔获 |
+| /afa monster | 全局开/关不钓怪物 |
+| /afa anim | 全局开/关跳过上鱼动画 |
 
-4.`消耗数量`为消耗多少个物品数量来换取玩家自动钓鱼使用`自动时长`，时长单位为`分钟`，可通过/af菜单指令查看
-
-5.`消耗物品`为指定消耗的物品ID，用于开启自动钓鱼功能用。
-
-6.`额外渔获`当其开启时，会无视环境要求和鱼获检查，钓上这个数组里的随机物品
-
-7.`随机物品`开启时会随机钓出任意物品
-
-8.`禁止衍生弹幕`用来禁止在多线钓鱼模式时，单体召唤物会衍生出更多数量。
+其他：`/reload`（tshock.cfg.reload）可重载配置。
 
 ## 配置
 
-> 配置文件位置：tshock/AutoFish.json
+- 路径: `tshock/AutoFish.json`
+- 关键项（部分）：
+  - 插件总开关：`插件总开关`
+  - 全局/默认：自动钓鱼、Buff、多钩、消耗模式、过滤不可堆叠、不钓怪、跳过动画、保护贵重鱼饵
+  - 多钩上限：`多钩上限`
+  - 消耗模式：`消耗数量`、`奖励时长`、`消耗物品`
+  - 贵重鱼饵：`贵重鱼饵列表`
+  - 额外渔获：`额外渔获`
+  - 随机物品：`随机物品`（开启后随机钓出任意物品）
+  - Buff 表：`Buff表` （键=Buff ID，值=持续时间）
+  - 禁止衍生弹幕：`禁止衍生弹幕`
 
-重要开关（全局 + 默认）：
-
-- 插件开关：`插件开关`
-- 插件开关：`插件总开关`
-- 全局自动钓鱼：`全局自动钓鱼开关`；玩家默认状态：`默认自动钓鱼开关`
-- 全局多钩：`全局多钩钓鱼开关`；玩家默认状态：`默认多钩开关`；全局上限：`多钩上限`
-- 全局 Buff：`全局Buff开关`；玩家默认状态：`默认Buff开关`
-- 全局消耗模式：`全局消耗模式开关`；玩家默认状态：`默认消耗模式`
-- 过滤不可堆叠：`全局过滤不可堆叠物品`；玩家默认状态：`默认过滤不可堆叠物品`
-- 不钓怪物：`全局不钓怪物`；玩家默认状态：`默认不钓怪物`
-- 跳过上鱼动画：`全局跳过上鱼动画`；玩家默认状态：`默认跳过上鱼动画`
+> 重新生成默认配置：删除 `tshock/AutoFish.json` 后 `/reload`，插件会写入默认值。
 
 ```json
 {
   "插件总开关": true,
   "全局自动钓鱼开关": true,
-  "全局Buff开关": true,
-  "全局多钩钓鱼开关": true,
-  "全局消耗模式开关": false,
-  "全局过滤不可堆叠物品": true,
-  "默认过滤不可堆叠物品": true,
-  "全局不钓怪物": true,
-  "默认不钓怪物": true,
-  "全局跳过上鱼动画": true,
-  "默认跳过上鱼动画": true,
-  "随机物品": false,
-  "多钩上限": 5,
   "默认自动钓鱼开关": false,
+  "全局Buff开关": true,
   "默认Buff开关": false,
+  "全局多钩钓鱼开关": true,
+  "多钩上限": 5,
   "默认多钩开关": false,
+  "全局消耗模式开关": false,
   "默认消耗模式": false,
-  "Buff表": {},
   "消耗数量": 10,
   "奖励时长": 12,
-  "额外渔获": [],
   "消耗物品": [
     2002,
     2675,
@@ -115,6 +95,37 @@
     3191,
     3194
   ],
+  "全局过滤不可堆叠物品": true,
+  "默认过滤不可堆叠物品": true,
+  "全局不钓怪物": true,
+  "默认不钓怪物": true,
+  "全局跳过上鱼动画": true,
+  "默认跳过上鱼动画": true,
+  "全局保护贵重鱼饵": true,
+  "默认保护贵重鱼饵": true,
+  "贵重鱼饵列表": [
+    2673,
+    1999,
+    2436,
+    2437,
+    2438,
+    2891,
+    4340,
+    2893,
+    4362,
+    4419,
+    2895
+  ],
+  "随机物品": false,
+  "额外渔获": [
+    5,
+    72,
+    75,
+    276,
+    3093,
+    4345
+  ],
+  "Buff表": {},
   "禁止衍生弹幕": [
     623,
     625,
@@ -131,22 +142,18 @@
   ]
 }
 ```
+## 注意事项
 
-## 更新日志
-
-- 请移步CHANGELOG.md
+- `/af` 对普通玩家最简做法：给组添加 `autofish.common` 即可；若要禁用某功能，额外赋予对应 `autofish.no.<feature>`。
+- 启用消耗模式后，个人需要拥有消耗时长；插件会在缺少鱼饵时直接返回。
+- 多钩/过滤/不钓怪/跳过动画等均受“全局开关 + 个人开关 + 权限”共同约束。
 
 ## 反馈
 
-- 优先发issued -> 共同维护的插件库：https://github.com/UnrealMultiple/TShockPlugin
-- 次优先：TShock官方群：816771079
-- 大概率看不到但是也可以：国内社区trhub.cn ，bbstr.net , tr.monika.love
+- issue: https://github.com/UnrealMultiple/TShockPlugin
+- QQ：816771079
+- 社区：trhub.cn / bbstr.net / tr.monika.love
 
-## 已知问题
+## 更新日志
 
-- 非SSC服务器不扣鱼饵
-
-## TODO
-
-- 渔获概率可配置，不均等概率
-- 添加额外的可钓上来的敌怪
+- 见 CHANGELOG.md

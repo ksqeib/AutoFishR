@@ -10,10 +10,10 @@ namespace AutoFish.AFMain;
 [ApiVersion(2, 1)]
 public partial class AutoFish : TerrariaPlugin
 {
-    private const string PermissionPrefix = "autofish.";
-    private const string AdminPermission = $"{PermissionPrefix}admin";
-    private const string CommonPermission = $"{PermissionPrefix}common";
-    private const string DenyPermissionPrefix = $"{PermissionPrefix}no.";
+    public const string PermissionPrefix = "autofish.";
+    public const string AdminPermission = $"{PermissionPrefix}admin";
+    public const string CommonPermission = $"{PermissionPrefix}common";
+    public const string DenyPermissionPrefix = $"{PermissionPrefix}no.";
 
     /// <summary>全局配置实例。</summary>
     internal static Configuration Config = new();

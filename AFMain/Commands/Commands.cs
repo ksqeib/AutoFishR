@@ -63,7 +63,7 @@ public partial class Commands
         if (!AutoFish.Config.PluginEnabled) return;
 
         var caller = args.Player ?? TSPlayer.Server;
-        if (!caller.HasPermission("autofish.admin"))
+        if (!caller.HasPermission(AutoFish.AdminPermission))
         {
             caller.SendErrorMessage("你没有权限使用管理员指令。");
             return;

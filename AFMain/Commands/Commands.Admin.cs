@@ -36,7 +36,7 @@ public partial class Commands
     private static bool HandleAdminCommand(CommandArgs args)
     {
         var caller = args.Player ?? TSPlayer.Server;
-        if (!caller.HasPermission("autofish.admin")) return false;
+        if (!caller.HasPermission(AutoFish.AdminPermission)) return false;
 
         var sub = args.Parameters[0].ToLower();
 

@@ -62,6 +62,7 @@ public partial class Commands
         sb.AppendLine($"过滤不可堆叠：{(playerData.SkipNonStackableLoot ? "开启" : "关闭")}");
         sb.AppendLine($"不钓怪物：{(playerData.BlockMonsterCatch ? "开启" : "关闭")}");
         sb.AppendLine($"跳过上鱼动画：{(playerData.SkipFishingAnimation ? "开启" : "关闭")}");
+        sb.AppendLine($"保护贵重鱼饵：{(playerData.ProtectValuableBaitEnabled ? "开启" : "关闭")}");
 
         if (AutoFish.Config.BaitItemIds.Any() || playerData.ConsumptionEnabled)
         {

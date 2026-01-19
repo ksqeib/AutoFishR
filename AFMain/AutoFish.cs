@@ -51,6 +51,7 @@ public partial class AutoFish : TerrariaPlugin
         var canSkipNonStackable = HasFeaturePermission(player, "autofish.filter.unstackable");
         var canBlockMonster = HasFeaturePermission(player, "autofish.filter.monster");
         var canSkipAnimation = HasFeaturePermission(player, "autofish.skipanimation");
+        var canProtectBait = HasFeaturePermission(player, "autofish.bait.protect");
 
         var defaultAutoFish = Config.DefaultAutoFishEnabled && canFish;
         var defaultBuff = Config.DefaultBuffEnabled && canBuff;
@@ -62,6 +63,8 @@ public partial class AutoFish : TerrariaPlugin
                        canBlockMonster;
         var defaultSkipAnimation = Config.GlobalSkipFishingAnimation && Config.DefaultSkipFishingAnimation &&
                         canSkipAnimation;
+        var defaultProtectBait = Config.ProtectValuableBaitEnabled && Config.DefaultProtectValuableBaitEnabled &&
+                      canProtectBait;
 
         return new AFPlayerData.ItemData
         {
@@ -74,6 +77,7 @@ public partial class AutoFish : TerrariaPlugin
             SkipNonStackableLoot = defaultSkipNonStackable,
             BlockMonsterCatch = defaultBlockMonster,
             SkipFishingAnimation = defaultSkipAnimation,
+            ProtectValuableBaitEnabled = defaultProtectBait,
             FirstFishHintShown = false
         };
     }

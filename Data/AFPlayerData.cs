@@ -38,7 +38,7 @@ public class AFPlayerData
         public ItemData(string name = "", bool autoFishEnabled = true, bool consumptionEnabled = true,
             bool buffEnabled = false, int hookMaxNum = 3, bool multiHookEnabled = false,
             bool firstFishHintShown = false, bool skipNonStackableLoot = true, bool blockMonsterCatch = false,
-            bool skipFishingAnimation = true)
+            bool skipFishingAnimation = true, bool protectValuableBaitEnabled = true)
         {
             Name = name ?? "";
             AutoFishEnabled = autoFishEnabled;
@@ -50,6 +50,7 @@ public class AFPlayerData
             SkipNonStackableLoot = skipNonStackableLoot;
             BlockMonsterCatch = blockMonsterCatch;
             SkipFishingAnimation = skipFishingAnimation;
+            ProtectValuableBaitEnabled = protectValuableBaitEnabled;
         }
 
         //玩家名字
@@ -81,6 +82,9 @@ public class AFPlayerData
 
         //跳过上鱼动画
         public bool SkipFishingAnimation { get; set; } = true;
+
+        //保护贵重鱼饵
+        public bool ProtectValuableBaitEnabled { get; set; } = true;
 
         //记录时间
         public DateTime LogTime { get; set; }

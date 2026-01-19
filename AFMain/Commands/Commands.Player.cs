@@ -43,6 +43,12 @@ public partial class Commands
 
         if (AutoFish.Config.ExtraCatchItemIds.Count != 0)
             helpMessage.Append("\n/af loot -- 查看[c/F25055:额外渔获表]");
+
+        if (AutoFish.Config.ProtectValuableBaitEnabled && AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+        {
+            helpMessage.Append("\n/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]");
+            helpMessage.Append("\n/af baitlist -- 查看贵重鱼饵列表");
+        }
     }
 
     private static bool HandlePlayerCommand(CommandArgs args, AFPlayerData.ItemData playerData, double remainingMinutes)
@@ -142,6 +148,39 @@ public partial class Commands
 
                     playerData.SkipFishingAnimation = !playerData.SkipFishingAnimation;
                     args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipFishingAnimation ? "启用" : "禁用")}]跳过上鱼动画。");
+                    return true;
+                case "bait":
+                    if (!AutoFish.Config.ProtectValuableBaitEnabled)
+                    {
+                        args.Player.SendWarningMessage("保护贵重鱼饵未在全局开启，无法切换。");
+                        return true;
+                    }
+
+                    if (!AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+                    {
+                        args.Player.SendErrorMessage("你没有权限使用保护贵重鱼饵功能。");
+                        return true;
+                    }
+
+                    playerData.ProtectValuableBaitEnabled = !playerData.ProtectValuableBaitEnabled;
+                    args.Player.SendSuccessMessage($"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.ProtectValuableBaitEnabled ? "启用" : "禁用")}]保护贵重鱼饵。");
+                    return true;
+                case "baitlist":
+                    if (!AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+                    {
+                        args.Player.SendErrorMessage("你没有权限查看保护鱼饵列表。");
+                        return true;
+                    }
+
+                    if (!AutoFish.Config.ValuableBaitItemIds.Any())
+                    {
+                        args.Player.SendWarningMessage("当前未配置任何贵重鱼饵。");
+                        return true;
+                    }
+
+                    args.Player.SendInfoMessage("[保护贵重鱼饵列表]\n" + string.Join(", ",
+                        AutoFish.Config.ValuableBaitItemIds.Select(x =>
+                            TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
                     return true;
                 case "list" when AutoFish.Config.BaitItemIds.Any():
                     args.Player.SendInfoMessage("[指定消耗物品表]\n" + string.Join(", ",

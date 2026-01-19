@@ -32,6 +32,8 @@ public partial class AutoFish
                                 HasFeaturePermission(player, "autofish.filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
                                    HasFeaturePermission(player, "autofish.skipanimation");
+        var protectValuableBait = Config.ProtectValuableBaitEnabled &&
+                       HasFeaturePermission(player, "autofish.bait.protect");
 
         // 从数据表中获取与玩家名字匹配的配置项
         var playerData = PlayerData.GetOrCreatePlayerData(player.Name, CreateDefaultPlayerData);
@@ -40,6 +42,7 @@ public partial class AutoFish
         skipNonStackableLoot &= playerData.SkipNonStackableLoot;
         blockMonsterCatch &= playerData.BlockMonsterCatch;
         skipFishingAnimation &= playerData.SkipFishingAnimation;
+        protectValuableBait &= playerData.ProtectValuableBaitEnabled;
 
         // 正常状态下与消耗模式下启用自动钓鱼
         if (Config.GlobalConsumptionModeEnabled && !playerData.ConsumptionEnabled) return;
@@ -51,13 +54,17 @@ public partial class AutoFish
         if (baitType == 0) return; //没有鱼饵，不要继续
 
         // 保护贵重鱼饵：将其移到背包末尾以避免被消耗
-        if (Config.ProtectValuableBaitEnabled && Config.ValuableBaitItemIds.Contains(baitType))
+        if (protectValuableBait && Config.ValuableBaitItemIds.Contains(baitType))
         {
             if (Tools.TrySwapValuableBaitToBack(player, baitType, Config.ValuableBaitItemIds,
-                    out var fromSlot, out var toSlot))
+                    out var fromSlot, out var toSlot, out var fromType, out var toType))
             {
                 player.SendData(PacketTypes.PlayerSlot, "", player.Index, fromSlot);
                 player.SendData(PacketTypes.PlayerSlot, "", player.Index, toSlot);
+                var fromName = TShock.Utils.GetItemById(fromType).Name;
+                var toName = TShock.Utils.GetItemById(toType).Name;
+                Tools.SendGradientMessage(player,
+                    $"检测到贵重鱼饵，已与背包末尾鱼饵交换：{fromName} -> {toName} (槽位 {fromSlot} ↔ {toSlot})");
                 resetHook(hook);
                 return;
             }
@@ -71,7 +78,6 @@ public partial class AutoFish
         var caughtMonster = false;
         for (var count = 0; noCatch && count < dropLimit; count++)
         {
-            //61就是直接调用AI_061_FishingBobber
             //原版方法，获取物品啥的
             hook.FishingCheck();
 

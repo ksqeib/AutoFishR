@@ -43,6 +43,7 @@ internal class Configuration
     public bool DefaultSkipFishingAnimation { get; set; } = true;
 
     [JsonProperty("保护贵重鱼饵", Order = -84)] public bool ProtectValuableBaitEnabled { get; set; } = true;
+    [JsonProperty("默认保护贵重鱼饵", Order = -83)] public bool DefaultProtectValuableBaitEnabled { get; set; } = true;
     [JsonProperty("贵重鱼饵列表", Order = -83)] public List<int> ValuableBaitItemIds { get; set; } = new();
 
     [JsonProperty("额外渔获", Order = -1)] public List<int> ExtraCatchItemIds = new();
@@ -98,6 +99,8 @@ internal class Configuration
             4419, //金水黾
             2895, //金蠕虫
         };
+
+        DefaultProtectValuableBaitEnabled = true;
 
         ExtraCatchItemIds = new List<int>
         {

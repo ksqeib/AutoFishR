@@ -15,28 +15,28 @@ public partial class Commands
         helpMessage.Append("\n/af -- 查看自动钓鱼菜单");
         helpMessage.Append("\n/af status -- 查看个人状态");
 
-        if (AutoFish.Config.GlobalAutoFishFeatureEnabled && AutoFish.HasFeaturePermission(player, "autofish.fish"))
+        if (AutoFish.Config.GlobalAutoFishFeatureEnabled && AutoFish.HasFeaturePermission(player, "fish"))
             helpMessage.Append("\n/af fish -- 开启丨关闭[c/4686D4:自动钓鱼]功能");
 
-        if (AutoFish.Config.GlobalBuffFeatureEnabled && AutoFish.HasFeaturePermission(player, "autofish.buff"))
+        if (AutoFish.Config.GlobalBuffFeatureEnabled && AutoFish.HasFeaturePermission(player, "buff"))
             helpMessage.Append("\n/af buff -- 开启丨关闭[c/F6B152:钓鱼BUFF]");
 
         if (AutoFish.Config.GlobalMultiHookFeatureEnabled &&
-            AutoFish.HasFeaturePermission(player, "autofish.multihook"))
+            AutoFish.HasFeaturePermission(player, "multihook"))
         {
             helpMessage.Append("\n/af multi -- 开启丨关闭[c/87DF86:多钩功能]");
             helpMessage.Append("\n/af hook 数字 -- 设置个人钩子上限 (<= 全局上限)");
         }
 
         if (AutoFish.Config.GlobalSkipNonStackableLoot &&
-            AutoFish.HasFeaturePermission(player, "autofish.filter.unstackable"))
+            AutoFish.HasFeaturePermission(player, "filter.unstackable"))
             helpMessage.Append("\n/af stack -- 开启丨关闭[c/F4C17F:过滤不可堆叠渔获]");
 
-        if (AutoFish.Config.GlobalBlockMonsterCatch && AutoFish.HasFeaturePermission(player, "autofish.filter.monster"))
+        if (AutoFish.Config.GlobalBlockMonsterCatch && AutoFish.HasFeaturePermission(player, "filter.monster"))
             helpMessage.Append("\n/af monster -- 开启丨关闭[c/F48FB1:不钓怪物]");
 
         if (AutoFish.Config.GlobalSkipFishingAnimation &&
-            AutoFish.HasFeaturePermission(player, "autofish.skipanimation"))
+            AutoFish.HasFeaturePermission(player, "skipanimation"))
             helpMessage.Append("\n/af anim -- 开启丨关闭[c/8EC4F4:跳过上鱼动画]");
 
         if (AutoFish.Config.GlobalConsumptionModeEnabled)
@@ -46,7 +46,7 @@ public partial class Commands
             helpMessage.Append("\n/af loot -- 查看[c/F25055:额外渔获表]");
 
         if (AutoFish.Config.GlobalProtectValuableBaitEnabled &&
-            AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+            AutoFish.HasFeaturePermission(player, "bait.protect"))
         {
             helpMessage.Append("\n/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]");
             helpMessage.Append("\n/af baitlist -- 查看贵重鱼饵列表");
@@ -62,7 +62,7 @@ public partial class Commands
             switch (sub)
             {
                 case "fish":
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.fish"))
+                    if (!AutoFish.HasFeaturePermission(player, "fish"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用自动钓鱼功能。");
                         return true;
@@ -74,7 +74,7 @@ public partial class Commands
                         $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(fishEnabled ? "禁用" : "启用")}]自动钓鱼功能。");
                     return true;
                 case "buff":
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.buff"))
+                    if (!AutoFish.HasFeaturePermission(player, "buff"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用自动钓鱼BUFF功能。");
                         return true;
@@ -86,7 +86,7 @@ public partial class Commands
                         $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(isEnabled ? "禁用" : "启用")}]自动钓鱼BUFF");
                     return true;
                 case "multi":
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.multihook"))
+                    if (!AutoFish.HasFeaturePermission(player, "multihook"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用多钩功能。");
                         return true;
@@ -112,7 +112,7 @@ public partial class Commands
                         return true;
                     }
 
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.filter.unstackable"))
+                    if (!AutoFish.HasFeaturePermission(player, "filter.unstackable"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用过滤不可堆叠功能。");
                         return true;
@@ -129,7 +129,7 @@ public partial class Commands
                         return true;
                     }
 
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.filter.monster"))
+                    if (!AutoFish.HasFeaturePermission(player, "filter.monster"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用不钓怪物功能。");
                         return true;
@@ -146,7 +146,7 @@ public partial class Commands
                         return true;
                     }
 
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.skipanimation"))
+                    if (!AutoFish.HasFeaturePermission(player, "skipanimation"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用跳过上鱼动画功能。");
                         return true;
@@ -163,7 +163,7 @@ public partial class Commands
                         return true;
                     }
 
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+                    if (!AutoFish.HasFeaturePermission(player, "bait.protect"))
                     {
                         args.Player.SendErrorMessage("你没有权限使用保护贵重鱼饵功能。");
                         return true;
@@ -174,7 +174,7 @@ public partial class Commands
                         $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.ProtectValuableBaitEnabled ? "启用" : "禁用")}]保护贵重鱼饵。");
                     return true;
                 case "baitlist":
-                    if (!AutoFish.HasFeaturePermission(player, "autofish.bait.protect"))
+                    if (!AutoFish.HasFeaturePermission(player, "bait.protect"))
                     {
                         args.Player.SendErrorMessage("你没有权限查看保护鱼饵列表。");
                         return true;
@@ -210,7 +210,7 @@ public partial class Commands
             switch (sub)
             {
                 case "hook":
-                    if (!AutoFish.HasFeaturePermission(args.Player, "autofish.multihook"))
+                    if (!AutoFish.HasFeaturePermission(args.Player, "multihook"))
                     {
                         args.Player.SendErrorMessage("你没有权限设置钩子上限。");
                         return true;

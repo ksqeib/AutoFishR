@@ -1,4 +1,5 @@
-﻿using AutoFish.Data;
+﻿using System.Collections.Generic;
+using AutoFish.Data;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -9,6 +10,11 @@ namespace AutoFish.AFMain;
 [ApiVersion(2, 1)]
 public partial class AutoFish : TerrariaPlugin
 {
+    private const string PermissionPrefix = "autofish.";
+    private const string AdminPermission = $"{PermissionPrefix}admin";
+    private const string CommonPermission = $"{PermissionPrefix}common";
+    private const string DenyPermissionPrefix = $"{PermissionPrefix}no.";
+
     /// <summary>全局配置实例。</summary>
     internal static Configuration Config = new();
 
@@ -43,13 +49,13 @@ public partial class AutoFish : TerrariaPlugin
         var player = TShock.Players.FirstOrDefault(p => p != null && p.Active &&
                                                         p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
 
-        var canBuff = HasFeaturePermission(player, "autofish.buff");
-        var canMulti = HasFeaturePermission(player, "autofish.multihook");
-        var canFish = HasFeaturePermission(player, "autofish.fish");
-        var canSkipNonStackable = HasFeaturePermission(player, "autofish.filter.unstackable");
-        var canBlockMonster = HasFeaturePermission(player, "autofish.filter.monster");
-        var canSkipAnimation = HasFeaturePermission(player, "autofish.skipanimation");
-        var canProtectBait = HasFeaturePermission(player, "autofish.bait.protect");
+        var canBuff = HasFeaturePermission(player, "buff");
+        var canMulti = HasFeaturePermission(player, "multihook");
+        var canFish = HasFeaturePermission(player, "fish");
+        var canSkipNonStackable = HasFeaturePermission(player, "filter.unstackable");
+        var canBlockMonster = HasFeaturePermission(player, "filter.monster");
+        var canSkipAnimation = HasFeaturePermission(player, "skipanimation");
+        var canProtectBait = HasFeaturePermission(player, "bait.protect");
 
         var defaultAutoFish = Config.DefaultAutoFishEnabled && canFish;
         var defaultBuff = Config.DefaultBuffEnabled && canBuff;
@@ -80,10 +86,20 @@ public partial class AutoFish : TerrariaPlugin
         };
     }
 
-    /// <summary>统一的权限检查，支持admin全覆盖。</summary>
-    internal static bool HasFeaturePermission(TSPlayer? player, string permission)
+    /// <summary>统一的权限检查，支持 admin 全覆盖、common 通用以及显式负权限。</summary>
+    internal static bool HasFeaturePermission(TSPlayer? player, string featureKey, bool allowCommon = true)
     {
-        return player != null && (player.HasPermission(permission) || player.HasPermission("autofish.admin"));
+        if (player == null) return false;
+
+        if (player.HasPermission(AdminPermission)) return true;
+
+        var denyPermission = $"{DenyPermissionPrefix}{featureKey}";
+        if (player.HasPermission(denyPermission)) return false;
+
+        if (allowCommon && player.HasPermission(CommonPermission)) return true;
+
+        var allowPermission = $"{PermissionPrefix}{featureKey}";
+        return player.HasPermission(allowPermission);
     }
 
     /// <summary>
@@ -98,8 +114,9 @@ public partial class AutoFish : TerrariaPlugin
         GetDataHandlers.NewProjectile += FirstFishHint!;
         GetDataHandlers.PlayerUpdate.Register(OnPlayerUpdate);
         ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
-        TShockAPI.Commands.ChatCommands.Add(new Command("autofish", Commands.Afs, "af", "autofish"));
-        TShockAPI.Commands.ChatCommands.Add(new Command("autofish.admin", Commands.Afa, "afa", "autofishadmin"));
+        TShockAPI.Commands.ChatCommands.Add(new Command(new List<string> { "autofish", CommonPermission },
+            Commands.Afs, "af", "autofish"));
+        TShockAPI.Commands.ChatCommands.Add(new Command(AdminPermission, Commands.Afa, "afa", "autofishadmin"));
     }
 
     /// <summary>

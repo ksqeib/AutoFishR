@@ -27,13 +27,13 @@ public partial class AutoFish
         if (!player.Active) return;
 
         var skipNonStackableLoot = Config.GlobalSkipNonStackableLoot &&
-                                   HasFeaturePermission(player, "autofish.filter.unstackable");
+                       HasFeaturePermission(player, "filter.unstackable");
         var blockMonsterCatch = Config.GlobalBlockMonsterCatch &&
-                                HasFeaturePermission(player, "autofish.filter.monster");
+                    HasFeaturePermission(player, "filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
-                                   HasFeaturePermission(player, "autofish.skipanimation");
+                       HasFeaturePermission(player, "skipanimation");
         var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
-                                  HasFeaturePermission(player, "autofish.bait.protect");
+                      HasFeaturePermission(player, "bait.protect");
 
         // 从数据表中获取与玩家名字匹配的配置项
         var playerData = PlayerData.GetOrCreatePlayerData(player.Name, CreateDefaultPlayerData);

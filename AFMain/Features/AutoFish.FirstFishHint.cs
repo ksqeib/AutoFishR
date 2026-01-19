@@ -19,7 +19,7 @@ public partial class AutoFish
         var projectile = Main.projectile[args.Index];
         if (!projectile.bobber) return;
 
-        if (!HasFeaturePermission(player, "autofish.fish")) return;
+        if (!HasFeaturePermission(player, "fish")) return;
 
         var playerData = PlayerData.GetOrCreatePlayerData(player.Name, CreateDefaultPlayerData);
         if (playerData.FirstFishHintShown) return;

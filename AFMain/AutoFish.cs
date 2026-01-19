@@ -28,7 +28,7 @@ public partial class AutoFish : TerrariaPlugin
     public override string Name => "自动钓鱼R";
 
     /// <summary>插件作者。</summary>
-    public override string Author => "羽学 少司命 ksqeib";
+    public override string Author => "ksqeib 羽学 少司命";
 
     /// <summary>插件版本。</summary>
     public override Version Version => new(1, 3, 3);

@@ -49,6 +49,11 @@ public partial class AutoFish
         args.Projectile.ai[0] = 1.0f;
 
         var fishingConditions = player.TPlayer.GetFishingConditions();
+        if (fishingConditions.BaitItemType == 0) //没有鱼饵，不要继续
+        {
+            return;
+        }
+
         //松露虫 判断一下玩家是否在海边
         if (fishingConditions.BaitItemType == 2673 && player.X / 16 == Main.oceanBG && player.Y / 16 == Main.oceanBG)
         {
@@ -69,22 +74,20 @@ public partial class AutoFish
             //原版方法，获取物品啥的
             args.Projectile.FishingCheck();
 
-            // FishingCheck_RollDropLevels - 会得出玩家得到的物品稀有度
-            // FishingCheck_ProbeForQuestFish - 任务🐟概率
-            // FishingCheck_RollEnemySpawns - 生成敌怪 -> fisher.rolledEnemySpawn -> -localAI[1]
-            // FishingCheck_RollItemDrop roll出敌怪就不会得到 -> fisher.rolledItemDrop -> localAI[1]
-            // fishingLevel 鱼力
-            // localAI[1]- 钓上来的东西
-            // AI[1]- 鱼力
+
             var catchId = args.Projectile.localAI[1];
-            if (Config.RandomLootEnabled) catchId = Random.Shared.Next(1, ItemID.Count);
 
-            // 如果额外渔获有任何1个物品ID，则参与AI[1]
-            if (Config.ExtraCatchItemIds.Any())
-                if (catchId <= 0) //额外渔获这里。。负数应该是boss
-                    catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
+            if (catchId < 0)
+            {
+                if (blockMonsterCatch)
+                {
+                    catchId = 0;
+                    args.Projectile.localAI[1] = 0;
+                    continue;
+                }
 
-            noCatch = catchId == 0;
+                caughtMonster = true;
+            }
 
             // 怪物生成使用localAI[1]，而物品则使用ai[1]，小于0情况无需处理，是刷血月怪
             if (catchId > 0)
@@ -95,53 +98,60 @@ public partial class AutoFish
                     item.SetDefaults((int)catchId);
                     if (item.maxStack == 1)
                     {
+                        catchId = 0;
+                        args.Projectile.localAI[1] = 0;
                         continue;
                     }
                 }
 
                 //ai[1] = localAI[1]
-                args.Projectile.ai[1] = catchId;
+                // args.Projectile.ai[1] = catchId;
             }
 
-            if (catchId < 0)
+            if (Config.RandomLootEnabled)
             {
-                if (blockMonsterCatch) continue;
-                caughtMonster = true;
+                catchId = Random.Shared.Next(1, ItemID.Count);
+            }
+
+            // 如果额外渔获有任何1个物品ID，则参与AI[1]
+            if (Config.ExtraCatchItemIds.Any())
+                if (catchId == 0) //钓不到就给额外的
+                    catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
+
+            noCatch = catchId == 0;
+            if (!noCatch)
+            {
+                args.Projectile.localAI[1] = catchId; //数值置回
+                break; //抓到就不应该继续判断
             }
         }
 
-        if (noCatch) return; //小于0不加新的
-        // 原版给东西的代码，在kill函数，会把ai[1]给玩家
-        // if (Main.myPlayer == this.owner && this.bobber)
-        // {
-        //     PopupText.ClearSonarText();
-        //     if ((double) this.ai[1] > 0.0 && (double) this.ai[1] < (double) ItemID.Count)
-        //         this.AI_061_FishingBobber_GiveItemToPlayer(Main.player[this.owner], (int) this.ai[1]);
-        //     this.ai[1] = 0.0f;
-        // }
-        // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
-        player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);
+        if (noCatch) return; //没抓到，不抬杆
 
         // 让服务器扣饵料
         var locate = LocateBait(player, fishingConditions.BaitItemType);
         player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(args.Projectile, out var pull,
             out var baitUsed);
-        if (pull)
+        if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug
+        //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];
+        player.TPlayer.ItemCheck_CheckFishingBobber_PullBobber(args.Projectile, baitUsed);
+        // 同步玩家背包
+        player.SendData(PacketTypes.PlayerSlot, "", player.Index, locate);
+        
+        // 原版给东西的代码，在kill函数，会把ai[1]给玩家
+        // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
+        player.SendData(PacketTypes.ProjectileNew, "", args.Projectile.whoAmI);
+
+        if (!caughtMonster) //抓到怪物触发会导致刷鱼漂，这里是重新设置溅射物
         {
-            //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];
-            player.TPlayer.ItemCheck_CheckFishingBobber_PullBobber(args.Projectile, baitUsed);
-            player.SendData(PacketTypes.PlayerSlot, "", player.Index, locate);
+            var velocity = new Vector2(0, 0);
+            var pos = new Vector2(args.Projectile.position.X, args.Projectile.position.Y + 3);
+            var index = SpawnProjectile.NewProjectile(
+                Main.projectile[args.Projectile.whoAmI].GetProjectileSource_FromThis(),
+                pos, velocity, args.Projectile.type, 0, 0,
+                args.Projectile.owner);
+            player.SendData(PacketTypes.ProjectileNew, "", index);
         }
-
-        if (caughtMonster) return; //抓到怪物好像不会kill掉原始弹幕，会导致刷弹幕
-
-        var velocity = new Vector2(0, 0);
-        var pos = new Vector2(args.Projectile.position.X, args.Projectile.position.Y + 3);
-        var index = SpawnProjectile.NewProjectile(
-            Main.projectile[args.Projectile.whoAmI].GetProjectileSource_FromThis(),
-            pos, velocity, args.Projectile.type, 0, 0,
-            args.Projectile.owner);
-        player.SendData(PacketTypes.ProjectileNew, "", index);
 
         if (skipFishingAnimation)
         {

@@ -26,6 +26,6 @@ public partial class AutoFish
         if (playerData.AutoFishEnabled) return;
 
         playerData.FirstFishHintShown = true;
-        player.SendInfoMessage("检测到你正在钓鱼，可使用 /af fish 开启自动钓鱼。");
+        player.SendInfoMessage(Lang.T("firstFishHint"));
     }
 }

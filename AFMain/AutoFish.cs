@@ -145,7 +145,7 @@ public partial class AutoFish : TerrariaPlugin
     private static void ReloadConfig(ReloadEventArgs args)
     {
         LoadConfig();
-        args.Player.SendInfoMessage("[自动钓鱼]重新加载配置完毕。");
+        args.Player.SendInfoMessage(Lang.T("reload.done"));
     }
 
     /// <summary>
@@ -154,5 +154,6 @@ public partial class AutoFish : TerrariaPlugin
     private static void LoadConfig()
     {
         Config = Configuration.Read();
+        Lang.Load(Config.Language);
     }
 }

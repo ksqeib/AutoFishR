@@ -63,7 +63,7 @@ public partial class AutoFish
                 var fromName = TShock.Utils.GetItemById(fromType).Name;
                 var toName = TShock.Utils.GetItemById(toType).Name;
                 Tools.SendGradientMessage(player,
-                    $"检测到贵重鱼饵，已与背包末尾鱼饵交换：{fromName} -> {toName} (槽位 {fromSlot} ↔ {toSlot})");
+                    Lang.T("protectBait.swap", fromName, toName, fromSlot, toSlot));
                 resetHook(hook);
                 return;
             }

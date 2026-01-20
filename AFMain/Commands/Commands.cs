@@ -21,7 +21,7 @@ public partial class Commands
 
         if (isConsole)
         {
-            player.SendInfoMessage("请使用 /afa 进行管理员命令。");
+            player.SendInfoMessage(Lang.T("help.consoleUseAfa"));
             return;
         }
 
@@ -36,12 +36,11 @@ public partial class Commands
             if (!isConsole)
             {
                 if (!playerData.AutoFishEnabled)
-                    args.Player.SendSuccessMessage("请输入该指令开启→: [c/92C5EC:/af fish]");
+                    args.Player.SendSuccessMessage(Lang.T("af.promptEnable"));
 
                 //开启了消耗模式
                 else if (playerData.ConsumptionEnabled)
-                    args.Player.SendMessage($"自动钓鱼[c/46C4D4:剩余时长]：[c/F3F292:{Math.Floor(remainingMinutes)}]分钟", 243,
-                        181,
+                    args.Player.SendMessage(Lang.T("af.remaining", Math.Floor(remainingMinutes)), 243, 181,
                         145);
             }
 
@@ -65,7 +64,7 @@ public partial class Commands
         var caller = args.Player ?? TSPlayer.Server;
         if (!caller.HasPermission(AutoFish.AdminPermission))
         {
-            caller.SendErrorMessage("你没有权限使用管理员指令。");
+            caller.SendErrorMessage(Lang.T("error.noPermission.admin"));
             return;
         }
 
@@ -86,22 +85,24 @@ public partial class Commands
     private static void SendStatus(TSPlayer player, AFPlayerData.ItemData playerData, double remainingMinutes)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("[自动钓鱼个人状态]");
-        sb.AppendLine($"功能：{(playerData.AutoFishEnabled ? "开启" : "关闭")}");
-        sb.AppendLine($"BUFF：{(playerData.BuffEnabled ? "开启" : "关闭")}");
-        sb.AppendLine($"多钩：{(playerData.MultiHookEnabled ? "开启" : "关闭")}, 钩子上限：{playerData.HookMaxNum}");
-        sb.AppendLine($"过滤不可堆叠：{(playerData.SkipNonStackableLoot ? "开启" : "关闭")}");
-        sb.AppendLine($"不钓怪物：{(playerData.BlockMonsterCatch ? "开启" : "关闭")}");
-        sb.AppendLine($"跳过上鱼动画：{(playerData.SkipFishingAnimation ? "开启" : "关闭")}");
-        sb.AppendLine($"保护贵重鱼饵：{(playerData.ProtectValuableBaitEnabled ? "开启" : "关闭")}");
+        var onOff = new Func<bool, string>(v => v ? Lang.T("common.enabled") : Lang.T("common.disabled"));
+
+        sb.AppendLine(Lang.T("status.title"));
+        sb.AppendLine(Lang.T("status.autofish", onOff(playerData.AutoFishEnabled)));
+        sb.AppendLine(Lang.T("status.buff", onOff(playerData.BuffEnabled)));
+        sb.AppendLine(Lang.T("status.multihook", onOff(playerData.MultiHookEnabled), playerData.HookMaxNum));
+        sb.AppendLine(Lang.T("status.skipUnstackable", onOff(playerData.SkipNonStackableLoot)));
+        sb.AppendLine(Lang.T("status.blockMonster", onOff(playerData.BlockMonsterCatch)));
+        sb.AppendLine(Lang.T("status.skipAnimation", onOff(playerData.SkipFishingAnimation)));
+        sb.AppendLine(Lang.T("status.protectBait", onOff(playerData.ProtectValuableBaitEnabled)));
 
         if (AutoFish.Config.BaitItemIds.Any() || playerData.ConsumptionEnabled)
         {
             var minutesLeft = Math.Max(0, Math.Floor(remainingMinutes));
             var consumeLine = playerData.ConsumptionEnabled
-                ? $"开启，剩余：{minutesLeft} 分钟"
-                : "关闭";
-            sb.AppendLine($"消耗模式：{consumeLine}");
+                ? Lang.T("status.consumptionEnabled", minutesLeft)
+                : Lang.T("status.consumptionDisabled");
+            sb.AppendLine(consumeLine);
         }
 
         player.SendInfoMessage(sb.ToString());

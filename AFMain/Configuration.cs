@@ -29,6 +29,9 @@ internal class Configuration
     /// <summary>插件总开关。</summary>
     public bool PluginEnabled { get; set; } = true;
 
+    /// <summary>界面与输出语言，默认 zh-cn。</summary>
+    public string Language { get; set; } = "zh-cn";
+
     /// <summary>全局启用自动钓鱼功能。</summary>
     public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
 
@@ -160,6 +163,7 @@ internal class Configuration
 
     private void Normalize()
     {
+        Language = string.IsNullOrWhiteSpace(Language) ? "zh-cn" : Language.ToLowerInvariant();
         BaitItemIds ??= new List<int> { 2002, 2675, 2676, 3191, 3194 };
         ValuableBaitItemIds ??= new List<int>
         {

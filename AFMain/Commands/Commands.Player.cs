@@ -12,44 +12,44 @@ public partial class Commands
     private static void AppendPlayerHelp(TSPlayer player, StringBuilder helpMessage)
     {
         // 个人指令（按权限和全局开关过滤）
-        helpMessage.Append("\n/af -- 查看自动钓鱼菜单");
-        helpMessage.Append("\n/af status -- 查看个人状态");
+        helpMessage.Append('\n').Append(Lang.T("help.player.af"));
+        helpMessage.Append('\n').Append(Lang.T("help.player.status"));
 
         if (AutoFish.Config.GlobalAutoFishFeatureEnabled && AutoFish.HasFeaturePermission(player, "fish"))
-            helpMessage.Append("\n/af fish -- 开启丨关闭[c/4686D4:自动钓鱼]功能");
+            helpMessage.Append('\n').Append(Lang.T("help.player.fish"));
 
         if (AutoFish.Config.GlobalBuffFeatureEnabled && AutoFish.HasFeaturePermission(player, "buff"))
-            helpMessage.Append("\n/af buff -- 开启丨关闭[c/F6B152:钓鱼BUFF]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.buff"));
 
         if (AutoFish.Config.GlobalMultiHookFeatureEnabled &&
             AutoFish.HasFeaturePermission(player, "multihook"))
         {
-            helpMessage.Append("\n/af multi -- 开启丨关闭[c/87DF86:多钩功能]");
-            helpMessage.Append("\n/af hook 数字 -- 设置个人钩子上限 (<= 全局上限)");
+            helpMessage.Append('\n').Append(Lang.T("help.player.multi"));
+            helpMessage.Append('\n').Append(Lang.T("help.player.hook"));
         }
 
         if (AutoFish.Config.GlobalSkipNonStackableLoot &&
             AutoFish.HasFeaturePermission(player, "filter.unstackable"))
-            helpMessage.Append("\n/af stack -- 开启丨关闭[c/F4C17F:过滤不可堆叠渔获]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.stack"));
 
         if (AutoFish.Config.GlobalBlockMonsterCatch && AutoFish.HasFeaturePermission(player, "filter.monster"))
-            helpMessage.Append("\n/af monster -- 开启丨关闭[c/F48FB1:不钓怪物]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.monster"));
 
         if (AutoFish.Config.GlobalSkipFishingAnimation &&
             AutoFish.HasFeaturePermission(player, "skipanimation"))
-            helpMessage.Append("\n/af anim -- 开启丨关闭[c/8EC4F4:跳过上鱼动画]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.anim"));
 
         if (AutoFish.Config.GlobalConsumptionModeEnabled)
-            helpMessage.Append("\n/af list -- 列出消耗模式[c/F5F251:指定物品表]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.list"));
 
         if (AutoFish.Config.ExtraCatchItemIds.Count != 0)
-            helpMessage.Append("\n/af loot -- 查看[c/F25055:额外渔获表]");
+            helpMessage.Append('\n').Append(Lang.T("help.player.loot"));
 
         if (AutoFish.Config.GlobalProtectValuableBaitEnabled &&
             AutoFish.HasFeaturePermission(player, "bait.protect"))
         {
-            helpMessage.Append("\n/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]");
-            helpMessage.Append("\n/af baitlist -- 查看贵重鱼饵列表");
+            helpMessage.Append('\n').Append(Lang.T("help.player.bait"));
+            helpMessage.Append('\n').Append(Lang.T("help.player.baitlist"));
         }
     }
 
@@ -64,43 +64,49 @@ public partial class Commands
                 case "fish":
                     if (!AutoFish.HasFeaturePermission(player, "fish"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用自动钓鱼功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.af"));
                         return true;
                     }
 
-                    var fishEnabled = playerData.AutoFishEnabled;
-                    playerData.AutoFishEnabled = !fishEnabled;
+                    playerData.AutoFishEnabled = !playerData.AutoFishEnabled;
+                    var fishVerb = Lang.T(playerData.AutoFishEnabled
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
                     args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(fishEnabled ? "禁用" : "启用")}]自动钓鱼功能。");
+                        Lang.T("success.toggle.fish", args.Player.Name, fishVerb));
                     return true;
                 case "buff":
                     if (!AutoFish.HasFeaturePermission(player, "buff"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用自动钓鱼BUFF功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.buff"));
                         return true;
                     }
 
-                    var isEnabled = playerData.BuffEnabled;
-                    playerData.BuffEnabled = !isEnabled;
+                    playerData.BuffEnabled = !playerData.BuffEnabled;
+                    var buffVerb = Lang.T(playerData.BuffEnabled
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
                     args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(isEnabled ? "禁用" : "启用")}]自动钓鱼BUFF");
+                        Lang.T("success.toggle.buff", args.Player.Name, buffVerb));
                     return true;
                 case "multi":
                     if (!AutoFish.HasFeaturePermission(player, "multihook"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用多钩功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.multi"));
                         return true;
                     }
 
                     if (!AutoFish.Config.GlobalMultiHookFeatureEnabled)
                     {
-                        args.Player.SendWarningMessage("多钩功能未在全局开启，无法切换。");
+                        args.Player.SendWarningMessage(Lang.T("warn.multiDisabled"));
                         return true;
                     }
 
                     playerData.MultiHookEnabled = !playerData.MultiHookEnabled;
-                    args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.MultiHookEnabled ? "启用" : "禁用")}]多钩功能。");
+                    var multiVerb = Lang.T(playerData.MultiHookEnabled
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.multi", args.Player.Name, multiVerb));
                     return true;
                 case "status":
                     SendStatus(args.Player, playerData, remainingMinutes);
@@ -108,97 +114,105 @@ public partial class Commands
                 case "stack":
                     if (!AutoFish.Config.GlobalSkipNonStackableLoot)
                     {
-                        args.Player.SendWarningMessage("过滤不可堆叠未在全局开启，无法切换。");
+                        args.Player.SendWarningMessage(Lang.T("warn.stackDisabled"));
                         return true;
                     }
 
                     if (!AutoFish.HasFeaturePermission(player, "filter.unstackable"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用过滤不可堆叠功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.stack"));
                         return true;
                     }
 
                     playerData.SkipNonStackableLoot = !playerData.SkipNonStackableLoot;
-                    args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipNonStackableLoot ? "启用" : "禁用")}]过滤不可堆叠渔获。");
+                    var stackVerb = Lang.T(playerData.SkipNonStackableLoot
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.stack", args.Player.Name, stackVerb));
                     return true;
                 case "monster":
                     if (!AutoFish.Config.GlobalBlockMonsterCatch)
                     {
-                        args.Player.SendWarningMessage("不钓怪物未在全局开启，无法切换。");
+                        args.Player.SendWarningMessage(Lang.T("warn.monsterDisabled"));
                         return true;
                     }
 
                     if (!AutoFish.HasFeaturePermission(player, "filter.monster"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用不钓怪物功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.monster"));
                         return true;
                     }
 
                     playerData.BlockMonsterCatch = !playerData.BlockMonsterCatch;
-                    args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.BlockMonsterCatch ? "启用" : "禁用")}]不钓怪物。");
+                    var monsterVerb = Lang.T(playerData.BlockMonsterCatch
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.monster", args.Player.Name, monsterVerb));
                     return true;
                 case "anim":
                     if (!AutoFish.Config.GlobalSkipFishingAnimation)
                     {
-                        args.Player.SendWarningMessage("跳过上鱼动画未在全局开启，无法切换。");
+                        args.Player.SendWarningMessage(Lang.T("warn.animDisabled"));
                         return true;
                     }
 
                     if (!AutoFish.HasFeaturePermission(player, "skipanimation"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用跳过上鱼动画功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.anim"));
                         return true;
                     }
 
                     playerData.SkipFishingAnimation = !playerData.SkipFishingAnimation;
-                    args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.SkipFishingAnimation ? "启用" : "禁用")}]跳过上鱼动画。");
+                    var animVerb = Lang.T(playerData.SkipFishingAnimation
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.anim", args.Player.Name, animVerb));
                     return true;
                 case "bait":
                     if (!AutoFish.Config.GlobalProtectValuableBaitEnabled)
                     {
-                        args.Player.SendWarningMessage("保护贵重鱼饵未在全局开启，无法切换。");
+                        args.Player.SendWarningMessage(Lang.T("warn.protectDisabled"));
                         return true;
                     }
 
                     if (!AutoFish.HasFeaturePermission(player, "bait.protect"))
                     {
-                        args.Player.SendErrorMessage("你没有权限使用保护贵重鱼饵功能。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.protectBait"));
                         return true;
                     }
 
                     playerData.ProtectValuableBaitEnabled = !playerData.ProtectValuableBaitEnabled;
-                    args.Player.SendSuccessMessage(
-                        $"玩家 [{args.Player.Name}] 已[c/92C5EC:{(playerData.ProtectValuableBaitEnabled ? "启用" : "禁用")}]保护贵重鱼饵。");
+                    var baitVerb = Lang.T(playerData.ProtectValuableBaitEnabled
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.protectBait", args.Player.Name, baitVerb));
                     return true;
                 case "baitlist":
                     if (!AutoFish.HasFeaturePermission(player, "bait.protect"))
                     {
-                        args.Player.SendErrorMessage("你没有权限查看保护鱼饵列表。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.baitlist"));
                         return true;
                     }
 
                     if (!AutoFish.Config.ValuableBaitItemIds.Any())
                     {
-                        args.Player.SendWarningMessage("当前未配置任何贵重鱼饵。");
+                        args.Player.SendWarningMessage(Lang.T("warn.noValuableBait"));
                         return true;
                     }
 
-                    args.Player.SendInfoMessage("[保护贵重鱼饵列表]\n" + string.Join(", ",
+                    args.Player.SendInfoMessage(Lang.T("info.valuableListHeader") + string.Join(", ",
                         AutoFish.Config.ValuableBaitItemIds.Select(x =>
                             TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
                     return true;
                 case "list" when AutoFish.Config.BaitItemIds.Any():
-                    args.Player.SendInfoMessage("[指定消耗物品表]\n" + string.Join(", ",
+                    args.Player.SendInfoMessage(Lang.T("info.consumeListHeader") + string.Join(", ",
                         AutoFish.Config.BaitItemIds.Select(x =>
                             TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
-                    args.Player.SendSuccessMessage(
-                        $"兑换规则为：每[c/F5F252:{AutoFish.Config.BaitConsumeCount}]个 => [c/92C5EC:{AutoFish.Config.RewardDurationMinutes}]分钟");
+                    args.Player.SendSuccessMessage(Lang.T("info.exchangeRule", AutoFish.Config.BaitConsumeCount,
+                        AutoFish.Config.RewardDurationMinutes));
                     return true;
                 case "loot" when AutoFish.Config.ExtraCatchItemIds.Any():
-                    args.Player.SendInfoMessage("[额外渔获表]\n" + string.Join(", ",
+                    args.Player.SendInfoMessage(Lang.T("info.extraLootHeader") + string.Join(", ",
                         AutoFish.Config.ExtraCatchItemIds.Select(x =>
                             TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
                     return true;
@@ -212,37 +226,37 @@ public partial class Commands
                 case "hook":
                     if (!AutoFish.HasFeaturePermission(args.Player, "multihook"))
                     {
-                        args.Player.SendErrorMessage("你没有权限设置钩子上限。");
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.hook"));
                         return true;
                     }
 
                     if (!AutoFish.Config.GlobalMultiHookFeatureEnabled)
                     {
-                        args.Player.SendWarningMessage("多钩功能未在全局开启，无法设置钩子数量。");
+                        args.Player.SendWarningMessage(Lang.T("warn.multiSetDisabled"));
                         return true;
                     }
 
                     if (!int.TryParse(args.Parameters[1], out var personalMax))
                     {
-                        args.Player.SendErrorMessage("请输入数字，格式：/af hook 数字");
+                        args.Player.SendErrorMessage(Lang.T("error.hookInvalidNumber"));
                         return true;
                     }
 
                     if (personalMax < 1)
                     {
-                        args.Player.SendWarningMessage("钩子数量必须大于等于 1。");
+                        args.Player.SendWarningMessage(Lang.T("warn.hookMin"));
                         return true;
                     }
 
                     if (personalMax > AutoFish.Config.GlobalMultiHookMaxNum)
                     {
-                        args.Player.SendWarningMessage($"已限制为全局上限：{AutoFish.Config.GlobalMultiHookMaxNum}。");
+                        args.Player.SendWarningMessage(Lang.T("warn.hookLimited", AutoFish.Config.GlobalMultiHookMaxNum));
                         personalMax = AutoFish.Config.GlobalMultiHookMaxNum;
                     }
 
                     playerData.HookMaxNum = personalMax;
                     args.Player.SendSuccessMessage(
-                        $"已将个人钩子上限设置为：{personalMax} (全局上限 {AutoFish.Config.GlobalMultiHookMaxNum})");
+                        Lang.T("success.set.hookPersonal", personalMax, AutoFish.Config.GlobalMultiHookMaxNum));
                     return true;
                 default:
                     return false;

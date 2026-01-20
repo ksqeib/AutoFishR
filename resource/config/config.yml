@@ -1,7 +1,10 @@
 # AutoFishR 配置模板
-# 路径：tshock/AutoFish/config.yml（缺失时插件会从 DLL 导出此模板）
+# 路径：tshock/config/AutoFish/config.yml（缺失时插件会从 DLL 导出此模板）
 # 约定：全局* 控制服务器是否允许该功能；默认* 仅在“新玩家数据”创建时赋值，之后玩家可用指令自行切换；权限与负权限仍然生效。
 # 重新生成：删除该文件后 /reload 即可写入默认模板。
+
+# 语言：对应 resource/lang/{culture}.yml，例如 zh-cn、en-us。
+language: zh-cn
 
 # 插件总开关：关闭后所有逻辑与命令短路返回。
 pluginEnabled: true

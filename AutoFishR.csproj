@@ -14,5 +14,6 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="resource\config\config.yml" />
+        <EmbeddedResource Include="resource\lang\zh-cn.yml" />
     </ItemGroup>
 </Project>

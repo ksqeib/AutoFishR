@@ -154,6 +154,5 @@ public partial class AutoFish : TerrariaPlugin
     private static void LoadConfig()
     {
         Config = Configuration.Read();
-        Config.Write();
     }
 }

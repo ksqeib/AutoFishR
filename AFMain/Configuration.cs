@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Reflection;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using TShockAPI;
 
 namespace AutoFish.AFMain;
@@ -8,106 +10,139 @@ namespace AutoFish.AFMain;
 /// </summary>
 internal class Configuration
 {
+    /// <summary>配置目录。</summary>
+    public static readonly string ConfigDirectory = Path.Combine(TShock.SavePath, "config", "AutoFish");
+
     /// <summary>配置文件路径。</summary>
-    public static readonly string FilePath = Path.Combine(TShock.SavePath, "AutoFish.json");
+    public static readonly string FilePath = Path.Combine(ConfigDirectory, "config.yml");
 
-    [JsonProperty("额外渔获", Order = 24)] public List<int> ExtraCatchItemIds = new();
+    private static readonly IDeserializer Deserializer = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .IgnoreUnmatchedProperties()
+        .Build();
 
-    [JsonProperty("插件总开关", Order = 1)] public bool PluginEnabled { get; set; } = true;
+    private static readonly ISerializer Serializer = new SerializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .WithIndentedSequences()
+        .Build();
 
-    [JsonProperty("全局自动钓鱼开关", Order = 2)] public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
-    [JsonProperty("默认自动钓鱼开关", Order = 3)] public bool DefaultAutoFishEnabled { get; set; }
+    /// <summary>插件总开关。</summary>
+    public bool PluginEnabled { get; set; } = true;
 
-    [JsonProperty("全局Buff开关", Order = 4)] public bool GlobalBuffFeatureEnabled { get; set; } = true;
-    [JsonProperty("默认Buff开关", Order = 5)] public bool DefaultBuffEnabled { get; set; }
+    /// <summary>全局启用自动钓鱼功能。</summary>
+    public bool GlobalAutoFishFeatureEnabled { get; set; } = true;
 
-    [JsonProperty("全局多钩钓鱼开关", Order = 6)] public bool GlobalMultiHookFeatureEnabled { get; set; } = true;
-    [JsonProperty("多钩上限", Order = 7)] public int GlobalMultiHookMaxNum { get; set; } = 5;
-    [JsonProperty("默认多钩开关", Order = 8)] public bool DefaultMultiHookEnabled { get; set; }
+    /// <summary>玩家默认是否开启自动钓鱼。</summary>
+    public bool DefaultAutoFishEnabled { get; set; }
 
-    [JsonProperty("全局消耗模式开关", Order = 9)] public bool GlobalConsumptionModeEnabled { get; set; }
-    [JsonProperty("默认消耗模式", Order = 10)] public bool DefaultConsumptionEnabled { get; set; }
-    [JsonProperty("消耗数量", Order = 11)] public int BaitConsumeCount { get; set; } = 10;
-    [JsonProperty("奖励时长", Order = 12)] public int RewardDurationMinutes { get; set; } = 12;
-    [JsonProperty("消耗物品", Order = 13)] public List<int> BaitItemIds { get; set; } = new();
+    /// <summary>全局启用自动 Buff 功能。</summary>
+    public bool GlobalBuffFeatureEnabled { get; set; } = true;
 
-    [JsonProperty("全局过滤不可堆叠物品", Order = 14)]
+    /// <summary>玩家默认是否开启自动 Buff。</summary>
+    public bool DefaultBuffEnabled { get; set; }
+
+    /// <summary>全局启用多钩功能。</summary>
+    public bool GlobalMultiHookFeatureEnabled { get; set; } = true;
+
+    /// <summary>多钩数量上限。</summary>
+    public int GlobalMultiHookMaxNum { get; set; } = 5;
+
+    /// <summary>玩家默认是否开启多钩。</summary>
+    public bool DefaultMultiHookEnabled { get; set; }
+
+    /// <summary>全局启用消耗模式。</summary>
+    public bool GlobalConsumptionModeEnabled { get; set; }
+
+    /// <summary>玩家默认是否开启消耗模式。</summary>
+    public bool DefaultConsumptionEnabled { get; set; }
+
+    /// <summary>奖励消耗的鱼饵数量。</summary>
+    public int BaitConsumeCount { get; set; } = 10;
+
+    /// <summary>奖励 Buff 持续分钟数。</summary>
+    public int RewardDurationMinutes { get; set; } = 12;
+
+    /// <summary>消耗模式允许的鱼饵 ID 列表。</summary>
+    public List<int> BaitItemIds { get; set; } = new()
+    {
+        2002, // 天界蜻蜓
+        2675, // 魔金虫
+        2676, // 火焰苍蝇
+        3191, // 魔煞虫
+        3194  // 恶魔心
+    };
+
+    /// <summary>全局跳过不可堆叠渔获。</summary>
     public bool GlobalSkipNonStackableLoot { get; set; } = true;
 
-    [JsonProperty("默认过滤不可堆叠物品", Order = 15)]
+    /// <summary>玩家默认是否跳过不可堆叠渔获。</summary>
     public bool DefaultSkipNonStackableLoot { get; set; } = true;
 
-    [JsonProperty("全局不钓怪物", Order = 16)] public bool GlobalBlockMonsterCatch { get; set; } = true;
-    [JsonProperty("默认不钓怪物", Order = 17)] public bool DefaultBlockMonsterCatch { get; set; } = true;
+    /// <summary>全局禁止钓上怪物。</summary>
+    public bool GlobalBlockMonsterCatch { get; set; } = true;
 
-    [JsonProperty("全局跳过上鱼动画", Order = 18)] public bool GlobalSkipFishingAnimation { get; set; } = true;
-    [JsonProperty("默认跳过上鱼动画", Order = 19)] public bool DefaultSkipFishingAnimation { get; set; } = true;
+    /// <summary>玩家默认是否禁止钓上怪物。</summary>
+    public bool DefaultBlockMonsterCatch { get; set; } = true;
 
-    [JsonProperty("全局保护贵重鱼饵", Order = 20)] public bool GlobalProtectValuableBaitEnabled { get; set; } = true;
-    [JsonProperty("默认保护贵重鱼饵", Order = 21)] public bool DefaultProtectValuableBaitEnabled { get; set; } = true;
-    [JsonProperty("贵重鱼饵列表", Order = 22)] public List<int> ValuableBaitItemIds { get; set; } = new();
+    /// <summary>全局跳过钓鱼动画。</summary>
+    public bool GlobalSkipFishingAnimation { get; set; } = true;
 
-    [JsonProperty("随机物品", Order = 23)] public bool RandomLootEnabled { get; set; }
+    /// <summary>玩家默认是否跳过钓鱼动画。</summary>
+    public bool DefaultSkipFishingAnimation { get; set; } = true;
 
-    [JsonProperty("Buff表", Order = 25)] public Dictionary<int, int> BuffDurations { get; set; } = new();
+    /// <summary>全局保护贵重鱼饵。</summary>
+    public bool GlobalProtectValuableBaitEnabled { get; set; } = true;
 
-    [JsonProperty("禁止衍生弹幕", Order = 26)]
-    public int[] DisabledProjectileIds { get; set; } =
-        new[] { 623, 625, 626, 627, 628, 831, 832, 833, 834, 835, 963, 970 };
+    /// <summary>玩家默认是否保护贵重鱼饵。</summary>
+    public bool DefaultProtectValuableBaitEnabled { get; set; } = true;
 
-    /// <summary>
-    ///     初始化默认的 Buff、鱼饵和额外渔获设置。
-    /// </summary>
-    public void Ints()
+    /// <summary>贵重鱼饵 ID 列表。</summary>
+    public List<int> ValuableBaitItemIds { get; set; } = new()
     {
-        BuffDurations = new Dictionary<int, int>
-        {
-            // { 80,10 },
-            // { 122,240 }
-        };
+        2673, // 松露虫
+        1999, // 帛斑蝶
+        2436, // 蓝水母
+        2437, // 绿水母
+        2438, // 粉水母
+        2891, // 金蝴蝶
+        4340, // 金蜻蜓
+        2893, // 金蚱蜢
+        4362, // 金瓢虫
+        4419, // 金水黾
+        2895  // 金蠕虫
+    };
 
-        BaitItemIds = new List<int>
-        {
-            2002, 2675, 2676, 3191, 3194
-        };
+    /// <summary>随机渔获功能开关。</summary>
+    public bool RandomLootEnabled { get; set; }
 
-        ValuableBaitItemIds = new List<int>
-        {
-            2673, // 松露虫
-            1999, //帛斑蝶
+    /// <summary>额外掉落的物品 ID 列表。</summary>
+    public List<int> ExtraCatchItemIds { get; set; } = new()
+    {
+        5,    // 蘑菇
+        72,   // 银币
+        75,   // 坠落之星
+        276,  // 仙人掌
+        3093, // 草药袋
+        4345  // 蠕虫罐头
+    };
 
-            2436, //蓝水母
-            2437, //绿水母
-            2438, //粉水母
+    /// <summary>Buff ID 与持续秒数映射。</summary>
+    public Dictionary<int, int> BuffDurations { get; set; } = new();
 
-            2891, //金蝴蝶
-            4340, //金蜻蜓
-            2893, //金蚱蜢
-            4362, //金瓢虫
-            4419, //金水黾
-            2895 //金蠕虫
-        };
-
-        DefaultProtectValuableBaitEnabled = true;
-
-        ExtraCatchItemIds = new List<int>
-        {
-            5, //蘑菇
-            72, //银币
-            75, //坠落之星
-            276, //仙人掌
-            3093, //草药袋
-            4345 //蠕虫罐头
-        };
-    }
+    /// <summary>禁用发射物 ID 列表。</summary>
+    public int[] DisabledProjectileIds { get; set; } =
+    {
+        623, 625, 626, 627, 628, 831, 832, 833, 834, 835, 963, 970
+    };
 
     /// <summary>
     ///     将当前配置写入磁盘。
     /// </summary>
     public void Write()
     {
-        var json = JsonConvert.SerializeObject(this, Formatting.Indented);
-        File.WriteAllText(FilePath, json);
+        Directory.CreateDirectory(ConfigDirectory);
+        var yaml = Serializer.Serialize(this);
+        File.WriteAllText(FilePath, yaml);
     }
 
     /// <summary>
@@ -115,15 +150,77 @@ internal class Configuration
     /// </summary>
     public static Configuration Read()
     {
-        if (!File.Exists(FilePath))
+        EnsureConfigFileExists();
+
+        var yamlContent = File.ReadAllText(FilePath);
+        var config = Deserializer.Deserialize<Configuration>(yamlContent) ?? new Configuration();
+        config.Normalize();
+        return config;
+    }
+
+    private void Normalize()
+    {
+        BaitItemIds ??= new List<int> { 2002, 2675, 2676, 3191, 3194 };
+        ValuableBaitItemIds ??= new List<int>
         {
-            var NewConfig = new Configuration();
-            NewConfig.Ints();
-            new Configuration().Write();
-            return NewConfig;
+            2673,
+            1999,
+            2436,
+            2437,
+            2438,
+            2891,
+            4340,
+            2893,
+            4362,
+            4419,
+            2895
+        };
+        ExtraCatchItemIds ??= new List<int> { 5, 72, 75, 276, 3093, 4345 };
+        BuffDurations ??= new Dictionary<int, int>();
+        DisabledProjectileIds ??= new[] { 623, 625, 626, 627, 628, 831, 832, 833, 834, 835, 963, 970 };
+    }
+
+    private static void EnsureConfigFileExists()
+    {
+        Directory.CreateDirectory(ConfigDirectory);
+
+        if (File.Exists(FilePath))
+        {
+            Console.WriteLine("[AutoFish]配置文件成功找到并加载");
+            return;
         }
 
-        var jsonContent = File.ReadAllText(FilePath);
-        return JsonConvert.DeserializeObject<Configuration>(jsonContent)!;
+        if (TryExportEmbeddedConfig())
+        {
+            Console.WriteLine("[AutoFish]导出默认配置成功");
+            return;
+        }
+
+        Console.WriteLine("[AutoFish]无法导出默认配置！！！！");
+        var defaultConfig = new Configuration();
+        defaultConfig.Write();
+    }
+
+    private static bool TryExportEmbeddedConfig()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith("config.yml", StringComparison.OrdinalIgnoreCase));
+
+        if (resourceName == null)
+        {
+            return false;
+        }
+
+        using var resourceStream = assembly.GetManifestResourceStream(resourceName);
+        if (resourceStream == null)
+        {
+            return false;
+        }
+
+        using var reader = new StreamReader(resourceStream);
+        var content = reader.ReadToEnd();
+        File.WriteAllText(FilePath, content);
+        return true;
     }
 }

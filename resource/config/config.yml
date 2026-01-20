@@ -1,0 +1,86 @@
+# 插件总开关
+pluginEnabled: true
+
+# 自动钓鱼功能开关（全局/玩家默认）
+globalAutoFishFeatureEnabled: true
+defaultAutoFishEnabled: false
+
+# 自动 Buff 功能开关（全局/玩家默认）
+globalBuffFeatureEnabled: true
+defaultBuffEnabled: false
+
+# 多钩功能（全局开关、数量上限、玩家默认）
+globalMultiHookFeatureEnabled: true
+globalMultiHookMaxNum: 5
+defaultMultiHookEnabled: false
+
+# 消耗模式（全局/玩家默认），奖励消耗鱼饵数量与持续时间（分钟）
+globalConsumptionModeEnabled: false
+defaultConsumptionEnabled: false
+baitConsumeCount: 10
+rewardDurationMinutes: 12
+# 允许消耗的鱼饵 ID 列表
+baitItemIds:
+  - 2002 # 天界蜻蜓
+  - 2675 # 魔金虫
+  - 2676 # 火焰苍蝇
+  - 3191 # 魔煞虫
+  - 3194 # 恶魔心
+
+# 是否跳过不可堆叠渔获（全局/玩家默认）
+globalSkipNonStackableLoot: true
+defaultSkipNonStackableLoot: true
+
+# 是否阻止钓上怪物（全局/玩家默认）
+globalBlockMonsterCatch: true
+defaultBlockMonsterCatch: true
+
+# 是否跳过钓鱼动画（全局/玩家默认）
+globalSkipFishingAnimation: true
+defaultSkipFishingAnimation: true
+
+# 保护贵重鱼饵（全局/玩家默认）
+globalProtectValuableBaitEnabled: true
+defaultProtectValuableBaitEnabled: true
+valuableBaitItemIds:
+  - 2673 # 松露虫
+  - 1999 # 帛斑蝶
+  - 2436 # 蓝水母
+  - 2437 # 绿水母
+  - 2438 # 粉水母
+  - 2891 # 金蝴蝶
+  - 4340 # 金蜻蜓
+  - 2893 # 金蚱蜢
+  - 4362 # 金瓢虫
+  - 4419 # 金水黾
+  - 2895 # 金蠕虫
+
+# 随机渔获开关
+randomLootEnabled: false
+
+# 额外掉落物品列表
+extraCatchItemIds:
+  - 5    # 蘑菇
+  - 72   # 银币
+  - 75   # 坠落之星
+  - 276  # 仙人掌
+  - 3093 # 草药袋
+  - 4345 # 蠕虫罐头
+
+# Buff 配置：键为 Buff ID，值为持续秒数
+buffDurations: {}
+
+# 禁用的发射物 ID 列表
+disabledProjectileIds:
+  - 623
+  - 625
+  - 626
+  - 627
+  - 628
+  - 831
+  - 832
+  - 833
+  - 834
+  - 835
+  - 963
+  - 970

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using TShockAPI;
@@ -11,7 +12,7 @@ namespace AutoFish.AFMain;
 internal class Configuration
 {
     /// <summary>配置目录。</summary>
-    public static readonly string ConfigDirectory = Path.Combine(TShock.SavePath, "config", "AutoFish");
+    public static readonly string ConfigDirectory = Path.Combine(TShock.SavePath, "AutoFish");
 
     /// <summary>配置文件路径。</summary>
     public static readonly string FilePath = Path.Combine(ConfigDirectory, "config.yml");
@@ -194,22 +195,37 @@ internal class Configuration
             return;
         }
 
-        if (TryExportEmbeddedConfig())
+        var preferredCulture = ResolvePreferredConfigCulture();
+        if (TryExportEmbeddedConfig(preferredCulture))
         {
-            Console.WriteLine("[AutoFish]导出默认配置成功");
+            Console.WriteLine($"[AutoFish]导出 {preferredCulture} 默认配置成功");
             return;
         }
 
-        Console.WriteLine("[AutoFish]无法导出默认配置！！！！");
+        if (!preferredCulture.Equals("en-us", StringComparison.OrdinalIgnoreCase) &&
+            TryExportEmbeddedConfig("en-us"))
+        {
+            Console.WriteLine("[AutoFish]导出 en-us 默认配置成功");
+            return;
+        }
+
+        if (!preferredCulture.Equals("zh-cn", StringComparison.OrdinalIgnoreCase) &&
+            TryExportEmbeddedConfig("zh-cn"))
+        {
+            Console.WriteLine("[AutoFish]导出 zh-cn 默认配置成功");
+            return;
+        }
+
+        Console.WriteLine($"[AutoFish]无法导出默认配置！！！！ {preferredCulture} ");
         var defaultConfig = new Configuration();
         defaultConfig.Write();
     }
 
-    private static bool TryExportEmbeddedConfig()
+    private static bool TryExportEmbeddedConfig(string culture)
     {
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = assembly.GetManifestResourceNames()
-            .FirstOrDefault(n => n.EndsWith("config.yml", StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(n => n.EndsWith($"{culture}.yml", StringComparison.OrdinalIgnoreCase));
 
         if (resourceName == null)
         {
@@ -226,5 +242,23 @@ internal class Configuration
         var content = reader.ReadToEnd();
         File.WriteAllText(FilePath, content);
         return true;
+    }
+
+    private static string ResolvePreferredConfigCulture()
+    {
+        var uiCulture = CultureInfo.CurrentUICulture;
+        var name = uiCulture.Name.ToLowerInvariant();
+
+        if (name.StartsWith("zh"))
+        {
+            return "zh-cn";
+        }
+
+        if (name.StartsWith("en"))
+        {
+            return "en-us";
+        }
+
+        return "en-us";
     }
 }

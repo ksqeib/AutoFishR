@@ -59,7 +59,7 @@
 其他：`/reload`（tshock.cfg.reload）可重载配置。
 
 ## 配置
-配置说明参见 [resource/config/config.yml](resource/config/config.yml)（缺失时插件会自动写入默认模板）。
+配置说明参见 [resource/config/zh-cn.yml](resource/config/zh-cn.yml) 或 [resource/config/en-us.yml](resource/config/en-us.yml)（缺失时插件会根据系统语言自动写入默认模板）。
 ## 注意事项
 
 - `/af` 对普通玩家最简做法：给组添加 `autofish.common` 即可；若要禁用某功能，额外赋予对应 `autofish.no.<feature>`。

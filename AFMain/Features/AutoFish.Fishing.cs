@@ -27,13 +27,13 @@ public partial class AutoFish
         if (!player.Active) return;
 
         var skipNonStackableLoot = Config.GlobalSkipNonStackableLoot &&
-                       HasFeaturePermission(player, "filter.unstackable");
+                                   HasFeaturePermission(player, "filter.unstackable");
         var blockMonsterCatch = Config.GlobalBlockMonsterCatch &&
-                    HasFeaturePermission(player, "filter.monster");
+                                HasFeaturePermission(player, "filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
-                       HasFeaturePermission(player, "skipanimation");
+                                   HasFeaturePermission(player, "skipanimation");
         var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
-                      HasFeaturePermission(player, "bait.protect");
+                                  HasFeaturePermission(player, "bait.protect");
 
         // 从数据表中获取与玩家名字匹配的配置项
         var playerData = PlayerData.GetOrCreatePlayerData(player.Name, CreateDefaultPlayerData);
@@ -122,7 +122,7 @@ public partial class AutoFish
 
         // 让服务器扣饵料
         var locate = LocateBait(player, baitType);
-        player.TPlayer.ItemCheck_CheckFishingBobber_PickAndConsumeBait(hook, out var pull,
+        var pull = player.TPlayer.ItemCheck_CheckFishingBobber_ConsumeBait(hook,
             out var baitUsed);
         if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug
         //原版收杆函数，这里会使得  bobber.ai[1] = bobber.localAI[1];，必须调用此函数，否则杆子会爆一堆弹幕，并且鱼饵会全不见

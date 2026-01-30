@@ -109,11 +109,10 @@ public partial class AutoFish : TerrariaPlugin
     {
         LoadConfig();
         GeneralHooks.ReloadEvent += ReloadConfig;
-        GetDataHandlers.NewProjectile += ProjectNew!;
-        GetDataHandlers.NewProjectile += BuffUpdate!;
-        GetDataHandlers.NewProjectile += FirstFishHint!;
         GetDataHandlers.PlayerUpdate.Register(OnPlayerUpdate);
-        ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
+        //容易出bug，还是OTAPI精准打击吧
+        // ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
+        HookEvents.Terraria.Projectile.AI_061_FishingBobber += OnAI_061_FishingBobber;
         TShockAPI.Commands.ChatCommands.Add(new Command(new List<string> { "autofish", CommonPermission },
             Commands.Afs, "af", "autofish"));
         TShockAPI.Commands.ChatCommands.Add(new Command(AdminPermission, Commands.Afa, "afa", "autofishadmin"));
@@ -127,11 +126,9 @@ public partial class AutoFish : TerrariaPlugin
         if (disposing)
         {
             GeneralHooks.ReloadEvent -= ReloadConfig;
-            GetDataHandlers.NewProjectile -= ProjectNew!;
-            GetDataHandlers.NewProjectile -= BuffUpdate!;
-            GetDataHandlers.NewProjectile -= FirstFishHint!;
             GetDataHandlers.PlayerUpdate.UnRegister(OnPlayerUpdate);
-            ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, ProjectAiUpdate);
+            // ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, ProjectAiUpdate);
+            HookEvents.Terraria.Projectile.AI_061_FishingBobber -= OnAI_061_FishingBobber;
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afs);
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afa);
         }

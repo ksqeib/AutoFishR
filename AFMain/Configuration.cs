@@ -57,9 +57,6 @@ internal class Configuration
     /// <summary>全局启用消耗模式。</summary>
     public bool GlobalConsumptionModeEnabled { get; set; }
 
-    /// <summary>玩家默认是否开启消耗模式。</summary>
-    public bool DefaultConsumptionEnabled { get; set; }
-
     /// <summary>奖励消耗的鱼饵数量。</summary>
     public int BaitConsumeCount { get; set; } = 10;
 
@@ -132,12 +129,7 @@ internal class Configuration
 
     /// <summary>Buff ID 与持续秒数映射。</summary>
     public Dictionary<int, int> BuffDurations { get; set; } = new();
-
-    /// <summary>禁用发射物 ID 列表。</summary>
-    public int[] DisabledProjectileIds { get; set; } =
-    {
-        623, 625, 626, 627, 628, 831, 832, 833, 834, 835, 963, 970
-    };
+    
 
     /// <summary>
     ///     将当前配置写入磁盘。
@@ -157,7 +149,7 @@ internal class Configuration
         EnsureConfigFileExists();
 
         var yamlContent = File.ReadAllText(FilePath);
-        var config = Deserializer.Deserialize<Configuration>(yamlContent) ?? new Configuration();
+        var config = Deserializer.Deserialize<Configuration>(yamlContent);
         config.Normalize();
         return config;
     }
@@ -165,24 +157,6 @@ internal class Configuration
     private void Normalize()
     {
         Language = string.IsNullOrWhiteSpace(Language) ? "zh-cn" : Language.ToLowerInvariant();
-        BaitItemIds ??= new List<int> { 2002, 2675, 2676, 3191, 3194 };
-        ValuableBaitItemIds ??= new List<int>
-        {
-            2673,
-            1999,
-            2436,
-            2437,
-            2438,
-            2891,
-            4340,
-            2893,
-            4362,
-            4419,
-            2895
-        };
-        ExtraCatchItemIds ??= new List<int> { 5, 72, 75, 276, 3093, 4345 };
-        BuffDurations ??= new Dictionary<int, int>();
-        DisabledProjectileIds ??= new[] { 623, 625, 626, 627, 628, 831, 832, 833, 834, 835, 963, 970 };
     }
 
     private static void EnsureConfigFileExists()

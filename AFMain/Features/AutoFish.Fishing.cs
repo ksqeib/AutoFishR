@@ -59,9 +59,6 @@ public partial class AutoFish
         skipFishingAnimation &= playerData.SkipFishingAnimation;
         protectValuableBait &= playerData.ProtectValuableBaitEnabled;
 
-        // 正常状态下与消耗模式下启用自动钓鱼
-        if (Config.GlobalConsumptionModeEnabled && !playerData.ConsumptionEnabled) return;
-
         //负数时候为咬钩倒计时，说明上鱼了
         if (!(hook.ai[1] < 0)) return;
 
@@ -84,9 +81,26 @@ public partial class AutoFish
             }
             else //就剩下一个了
             {
+                var baitName = TShock.Utils.GetItemById(baitType).Name;
+                Tools.SendGradientMessage(player, Lang.T("protectBait.lastOne", baitName));
+                resetHook(hook);
                 player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
                 return;
             }
+        
+        
+        // 正常状态下与消耗模式下启用自动钓鱼
+        if (Config.GlobalConsumptionModeEnabled)
+        {
+            //消耗模式判定
+            if (!CanConsumeFish(player, playerData))
+            {
+                player.SendInfoMessage(Lang.T("consumption.lackItem"));
+                resetHook(hook);
+                player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
+                return;
+            }
+        }
 
         //修改钓鱼得到的东西
         //获得钓鱼物品方法

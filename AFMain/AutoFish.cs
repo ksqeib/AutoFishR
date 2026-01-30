@@ -60,7 +60,6 @@ public partial class AutoFish : TerrariaPlugin
         var defaultAutoFish = Config.DefaultAutoFishEnabled && canFish;
         var defaultBuff = Config.DefaultBuffEnabled && canBuff;
         var defaultMulti = Config.DefaultMultiHookEnabled && canMulti;
-        var defaultConsumption = Config.DefaultConsumptionEnabled;
         var defaultSkipNonStackable = Config.GlobalSkipNonStackableLoot && Config.DefaultSkipNonStackableLoot &&
                                       canSkipNonStackable;
         var defaultBlockMonster = Config.GlobalBlockMonsterCatch && Config.DefaultBlockMonsterCatch &&
@@ -75,7 +74,6 @@ public partial class AutoFish : TerrariaPlugin
             Name = playerName,
             AutoFishEnabled = defaultAutoFish,
             BuffEnabled = defaultBuff,
-            ConsumptionEnabled = defaultConsumption,
             HookMaxNum = Config.GlobalMultiHookMaxNum,
             MultiHookEnabled = defaultMulti,
             SkipNonStackableLoot = defaultSkipNonStackable,
@@ -109,7 +107,6 @@ public partial class AutoFish : TerrariaPlugin
     {
         LoadConfig();
         GeneralHooks.ReloadEvent += ReloadConfig;
-        GetDataHandlers.PlayerUpdate.Register(OnPlayerUpdate);
         //容易出bug，还是OTAPI精准打击吧
         // ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
         HookEvents.Terraria.Projectile.AI_061_FishingBobber += OnAI_061_FishingBobber;
@@ -126,7 +123,6 @@ public partial class AutoFish : TerrariaPlugin
         if (disposing)
         {
             GeneralHooks.ReloadEvent -= ReloadConfig;
-            GetDataHandlers.PlayerUpdate.UnRegister(OnPlayerUpdate);
             // ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, ProjectAiUpdate);
             HookEvents.Terraria.Projectile.AI_061_FishingBobber -= OnAI_061_FishingBobber;
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afs);

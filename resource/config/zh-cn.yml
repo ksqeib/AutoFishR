@@ -24,17 +24,16 @@ defaultMultiHookEnabled: false
 
 # 消耗模式：需同时开启 global 与玩家个人开关且有剩余时长才会自动钓鱼/多钩。
 # 时长获取：消耗 baitItemIds 列表中的物品，每次消耗 baitConsumeCount 个，换取 rewardDurationMinutes 分钟。
-globalConsumptionModeEnabled: false
-defaultConsumptionEnabled: false
-baitConsumeCount: 10
-rewardDurationMinutes: 12
+globalConsumptionModeEnabled: true
+baitConsumeCount: 1
+rewardDurationMinutes: 1
 # 可用于兑换时长的鱼饵 ID
 baitItemIds:
-  - 2002 # 天界蜻蜓
-  - 2675 # 魔金虫
-  - 2676 # 火焰苍蝇
-  - 3191 # 魔煞虫
-  - 3194 # 恶魔心
+  - 2002 # 蠕虫
+  - 2675 # 熟手诱饵
+  - 2676 # 大师诱饵
+  - 3191 # 附魔夜行者
+  - 3194 # 蚜虫
 
 # 过滤不可堆叠渔获：开启后丢弃 maxStack==1 的掉落，重新判定。
 globalSkipNonStackableLoot: true
@@ -76,18 +75,3 @@ extraCatchItemIds:
 
 # Buff 表：键为 Buff ID，值为持续秒数；为空则不施加 Buff。
 buffDurations: {}
-
-# 禁用的发射物 ID：多线模式下屏蔽衍生弹幕。
-disabledProjectileIds:
-  - 623
-  - 625
-  - 626
-  - 627
-  - 628
-  - 831
-  - 832
-  - 833
-  - 834
-  - 835
-  - 963
-  - 970

@@ -53,7 +53,7 @@ public partial class Commands
         }
     }
 
-    private static bool HandlePlayerCommand(CommandArgs args, AFPlayerData.ItemData playerData, double remainingMinutes)
+    private static bool HandlePlayerCommand(CommandArgs args, AFPlayerData.ItemData playerData)
     {
         var player = args.Player;
         var sub = args.Parameters[0].ToLower();
@@ -109,7 +109,7 @@ public partial class Commands
                     args.Player.SendSuccessMessage(Lang.T("success.toggle.multi", args.Player.Name, multiVerb));
                     return true;
                 case "status":
-                    SendStatus(args.Player, playerData, remainingMinutes);
+                    SendStatus(args.Player, playerData);
                     return true;
                 case "stack":
                     if (!AutoFish.Config.GlobalSkipNonStackableLoot)

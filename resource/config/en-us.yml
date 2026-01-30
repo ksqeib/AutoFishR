@@ -24,10 +24,9 @@ defaultMultiHookEnabled: false
 
 # Consumption mode: requires both global and personal toggles plus remaining time to auto fish / multi-hook.
 # Duration gain: consume items in baitItemIds, each use consumes baitConsumeCount items for rewardDurationMinutes minutes.
-globalConsumptionModeEnabled: false
-defaultConsumptionEnabled: false
-baitConsumeCount: 10
-rewardDurationMinutes: 12
+globalConsumptionModeEnabled: true
+baitConsumeCount: 1
+rewardDurationMinutes: 1
 # Bait IDs that can be exchanged for time
 baitItemIds:
   - 2002 # Heavenfly
@@ -76,18 +75,3 @@ extraCatchItemIds:
 
 # Buff table: key = Buff ID, value = duration in seconds; empty means no buff.
 buffDurations: {}
-
-# Disabled projectile IDs: block spawned projectiles in multi-line mode.
-disabledProjectileIds:
-  - 623
-  - 625
-  - 626
-  - 627
-  - 628
-  - 831
-  - 832
-  - 833
-  - 834
-  - 835
-  - 963
-  - 970

@@ -26,10 +26,6 @@ public partial class Commands
         }
 
         var playerData = AutoFish.PlayerData.GetOrCreatePlayerData(player.Name, AutoFish.CreateDefaultPlayerData);
-
-        //消耗模式下的剩余时间记录
-        var remainingMinutes = AutoFish.Config.RewardDurationMinutes - (DateTime.Now - playerData.LogTime).TotalMinutes;
-
         if (args.Parameters.Count == 0)
         {
             HelpCmd(args.Player);
@@ -39,16 +35,18 @@ public partial class Commands
                     args.Player.SendSuccessMessage(Lang.T("af.promptEnable"));
 
                 //开启了消耗模式
-                else if (playerData.ConsumptionEnabled)
-                    args.Player.SendMessage(Lang.T("af.remaining", Math.Floor(remainingMinutes)), 243, 181,
-                        145);
+                else if (playerData.CanConsume())
+                {
+                    var (minutes, seconds) = playerData.GetRemainTime();
+                    args.Player.SendMessage(Lang.T("af.remaining", minutes, seconds), 243, 181, 145);
+                }
             }
 
             return;
         }
 
         if (!isConsole)
-            if (HandlePlayerCommand(args, playerData, remainingMinutes))
+            if (HandlePlayerCommand(args, playerData))
                 return;
 
         HelpCmd(args.Player);
@@ -82,7 +80,7 @@ public partial class Commands
     /// <summary>
     ///     展示个人状态信息。
     /// </summary>
-    private static void SendStatus(TSPlayer player, AFPlayerData.ItemData playerData, double remainingMinutes)
+    private static void SendStatus(TSPlayer player, AFPlayerData.ItemData playerData)
     {
         var sb = new StringBuilder();
         var onOff = new Func<bool, string>(v => v ? Lang.T("common.enabled") : Lang.T("common.disabled"));
@@ -96,12 +94,18 @@ public partial class Commands
         sb.AppendLine(Lang.T("status.skipAnimation", onOff(playerData.SkipFishingAnimation)));
         sb.AppendLine(Lang.T("status.protectBait", onOff(playerData.ProtectValuableBaitEnabled)));
 
-        if (AutoFish.Config.BaitItemIds.Any() || playerData.ConsumptionEnabled)
+        if (AutoFish.Config.BaitItemIds.Any() || playerData.CanConsume())
         {
-            var minutesLeft = Math.Max(0, Math.Floor(remainingMinutes));
-            var consumeLine = playerData.ConsumptionEnabled
-                ? Lang.T("status.consumptionEnabled", minutesLeft)
-                : Lang.T("status.consumptionDisabled");
+            string consumeLine;
+            if (playerData.CanConsume())
+            {
+                var (minutes, seconds) = playerData.GetRemainTime();
+                consumeLine = Lang.T("status.consumptionEnabled", minutes, seconds);
+            }
+            else
+            {
+                consumeLine = Lang.T("status.consumptionDisabled");
+            }
             sb.AppendLine(consumeLine);
         }
 

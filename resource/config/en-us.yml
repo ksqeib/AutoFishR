@@ -23,17 +23,26 @@ globalMultiHookMaxNum: 5
 defaultMultiHookEnabled: false
 
 # Consumption mode: requires both global and personal toggles plus remaining time to auto fish / multi-hook.
-# Duration gain: consume items in baitItemIds, each use consumes baitConsumeCount items for rewardDurationMinutes minutes.
+# Duration gain: consume bait configured in baitRewards, each bait type has different count and minutes.
 globalConsumptionModeEnabled: true
-baitConsumeCount: 1
-rewardDurationMinutes: 1
-# Bait IDs that can be exchanged for time
-baitItemIds:
-  - 2002 # Heavenfly
-  - 2675 # Golden Delight Bug
-  - 2676 # Firefly
-  - 3191 # Brimstone Bug
-  - 3194 # Demonic Heart Bug
+
+# Bait reward configuration: each bait can configure count (consume amount per use) and minutes (reward minutes)
+baitRewards:
+  2002:  # Worm
+    count: 1
+    minutes: 1
+  2675:  # Journeyman Bait
+    count: 1
+    minutes: 5
+  2676:  # Master Bait
+    count: 1
+    minutes: 10
+  3191:  # Enchanted Nightcrawler
+    count: 1
+    minutes: 8
+  3194:  # Aphid
+    count: 1
+    minutes: 5
 
 # Filter non-stackable loot: drop items with maxStack==1 and re-roll the catch.
 globalSkipNonStackableLoot: true

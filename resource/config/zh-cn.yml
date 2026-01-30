@@ -23,17 +23,26 @@ globalMultiHookMaxNum: 5
 defaultMultiHookEnabled: false
 
 # 消耗模式：需同时开启 global 与玩家个人开关且有剩余时长才会自动钓鱼/多钩。
-# 时长获取：消耗 baitItemIds 列表中的物品，每次消耗 baitConsumeCount 个，换取 rewardDurationMinutes 分钟。
+# 时长获取：消耗 baitRewards 中配置的鱼饵，每种鱼饵有不同的消耗数量和兑换时长。
 globalConsumptionModeEnabled: true
-baitConsumeCount: 1
-rewardDurationMinutes: 1
-# 可用于兑换时长的鱼饵 ID
-baitItemIds:
-  - 2002 # 蠕虫
-  - 2675 # 熟手诱饵
-  - 2676 # 大师诱饵
-  - 3191 # 附魔夜行者
-  - 3194 # 蚜虫
+
+# 鱼饵兑换配置：每种鱼饵可配置 count（每次消耗数量）和 minutes（兑换分钟数）
+baitRewards:
+  2002:  # 蠣虫
+    count: 1
+    minutes: 1
+  2675:  # 熟手诱饵
+    count: 1
+    minutes: 5
+  2676:  # 大师诱饵
+    count: 1
+    minutes: 10
+  3191:  # 附魔夜行者
+    count: 1
+    minutes: 8
+  3194:  # 蚜虫
+    count: 1
+    minutes: 5
 
 # 过滤不可堆叠渔获：开启后丢弃 maxStack==1 的掉落，重新判定。
 globalSkipNonStackableLoot: true

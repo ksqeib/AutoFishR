@@ -94,7 +94,7 @@ public partial class Commands
         sb.AppendLine(Lang.T("status.skipAnimation", onOff(playerData.SkipFishingAnimation)));
         sb.AppendLine(Lang.T("status.protectBait", onOff(playerData.ProtectValuableBaitEnabled)));
 
-        if (AutoFish.Config.BaitItemIds.Any() || playerData.CanConsume())
+        if (AutoFish.Config.BaitRewards.Any() || playerData.CanConsume())
         {
             string consumeLine;
             if (playerData.CanConsume())

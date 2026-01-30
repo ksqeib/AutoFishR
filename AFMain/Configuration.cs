@@ -57,20 +57,18 @@ internal class Configuration
     /// <summary>全局启用消耗模式。</summary>
     public bool GlobalConsumptionModeEnabled { get; set; }
 
-    /// <summary>奖励消耗的鱼饵数量。</summary>
-    public int BaitConsumeCount { get; set; } = 10;
-
-    /// <summary>奖励 Buff 持续分钟数。</summary>
-    public int RewardDurationMinutes { get; set; } = 12;
-
-    /// <summary>消耗模式允许的鱼饵 ID 列表。</summary>
-    public List<int> BaitItemIds { get; set; } = new()
+    /// <summary>
+    /// 消耗模式鱼饵配置。
+    /// 键：鱼饵物品ID
+    /// 值：Tuple<每次消耗数量, 兑换分钟数>
+    /// </summary>
+    public Dictionary<int, BaitReward> BaitRewards { get; set; } = new()
     {
-        2002, // 天界蜻蜓
-        2675, // 魔金虫
-        2676, // 火焰苍蝇
-        3191, // 魔煞虫
-        3194  // 恶魔心
+        { 2002, new BaitReward { Count = 1, Minutes = 1 } },   // 蠣虫
+        { 2675, new BaitReward { Count = 1, Minutes = 5 } },   // 熟手诱饵
+        { 2676, new BaitReward { Count = 1, Minutes = 10 } },  // 大师诱饵
+        { 3191, new BaitReward { Count = 1, Minutes = 8 } },   // 附魔夜行者
+        { 3194, new BaitReward { Count = 1, Minutes = 5 } }    // 蝗虫
     };
 
     /// <summary>全局跳过不可堆叠渔获。</summary>
@@ -235,4 +233,16 @@ internal class Configuration
 
         return "en-us";
     }
+}
+
+/// <summary>
+/// 鱼饵奖励配置。
+/// </summary>
+public class BaitReward
+{
+    /// <summary>每次消耗的鱼饵数量。</summary>
+    public int Count { get; set; }
+    
+    /// <summary>兑换的时长（分钟）。</summary>
+    public int Minutes { get; set; }
 }

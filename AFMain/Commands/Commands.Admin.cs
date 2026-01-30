@@ -91,13 +91,6 @@ public partial class Commands
                             : "common.disabledVerb")));
                     AutoFish.Config.Write();
                     return true;
-                case "set":
-                    caller.SendInfoMessage(Lang.T("info.currentConsumeCount", AutoFish.Config.BaitConsumeCount));
-                    return true;
-                case "time":
-                    caller.SendInfoMessage(
-                        Lang.T("info.currentDuration", AutoFish.Config.RewardDurationMinutes));
-                    return true;
                 default:
                     return false;
             }
@@ -121,25 +114,14 @@ public partial class Commands
 
             switch (sub)
             {
-                case "add":
-                    if (AutoFish.Config.BaitItemIds.Contains(item.type))
-                    {
-                        caller.SendErrorMessage(Lang.T("error.itemAlreadyInBait", item.Name));
-                        return true;
-                    }
-
-                    AutoFish.Config.BaitItemIds.Add(item.type);
-                    AutoFish.Config.Write();
-                    caller.SendSuccessMessage(Lang.T("success.item.addBait", item.Name));
-                    return true;
                 case "del":
-                    if (!AutoFish.Config.BaitItemIds.Contains(item.type))
+                    if (!AutoFish.Config.BaitRewards.ContainsKey(item.type))
                     {
                         caller.SendErrorMessage(Lang.T("error.itemNotInBait", item.Name));
                         return true;
                     }
 
-                    AutoFish.Config.BaitItemIds.Remove(item.type);
+                    AutoFish.Config.BaitRewards.Remove(item.type);
                     AutoFish.Config.Write();
                     caller.SendSuccessMessage(Lang.T("success.item.removeBait", item.Name));
                     return true;
@@ -165,15 +147,6 @@ public partial class Commands
                     AutoFish.Config.Write();
                     caller.SendSuccessMessage(Lang.T("success.item.removeLoot", item.Name));
                     return true;
-                case "set":
-                    if (int.TryParse(args.Parameters[1], out var consumeNum))
-                    {
-                        AutoFish.Config.BaitConsumeCount = consumeNum;
-                        AutoFish.Config.Write();
-                        caller.SendSuccessMessage(Lang.T("success.set.consumeCount", consumeNum));
-                    }
-
-                    return true;
                 case "duo":
                     if (int.TryParse(args.Parameters[1], out var maxNum))
                     {
@@ -183,19 +156,94 @@ public partial class Commands
                     }
 
                     return true;
-                case "time":
-                    if (int.TryParse(args.Parameters[1], out var rewardMinutes))
-                    {
-                        AutoFish.Config.RewardDurationMinutes = rewardMinutes;
-                        AutoFish.Config.Write();
-                        caller.SendSuccessMessage(Lang.T("success.set.duration", rewardMinutes));
-                    }
-
-                    return true;
                 default:
                     SendAdminHelpOnly(caller);
                     return true;
             }
+        }
+
+        // 处理 3 个参数的命令：add, set, time
+        if (args.Parameters.Count == 4)
+        {
+            var matchedItems = TShock.Utils.GetItemByIdOrName(args.Parameters[1]);
+            if (matchedItems.Count > 1)
+            {
+                caller.SendMultipleMatchError(matchedItems.Select(i => i.Name));
+                return true;
+            }
+
+            if (matchedItems.Count == 0)
+            {
+                caller.SendErrorMessage(Lang.T("error.itemNotFound"));
+                return true;
+            }
+
+            var item = matchedItems[0];
+
+            switch (sub)
+            {
+                case "add":
+                case "set":
+                    if (!int.TryParse(args.Parameters[2], out var count) || count < 1)
+                    {
+                        caller.SendErrorMessage("数量必须是大于 0 的整数！");
+                        return true;
+                    }
+
+                    if (!int.TryParse(args.Parameters[3], out var minutes) || minutes < 1)
+                    {
+                        caller.SendErrorMessage("分钟数必须是大于 0 的整数！");
+                        return true;
+                    }
+
+                    AutoFish.Config.BaitRewards[item.type] = new BaitReward 
+                    { 
+                        Count = count, 
+                        Minutes = minutes 
+                    };
+                    AutoFish.Config.Write();
+                    caller.SendSuccessMessage(Lang.T("success.set.baitReward", item.Name, count, minutes));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // 处理 3 个参数的 time 命令
+        if (args.Parameters.Count == 3 && sub == "time")
+        {
+            var matchedItems = TShock.Utils.GetItemByIdOrName(args.Parameters[1]);
+            if (matchedItems.Count > 1)
+            {
+                caller.SendMultipleMatchError(matchedItems.Select(i => i.Name));
+                return true;
+            }
+
+            if (matchedItems.Count == 0)
+            {
+                caller.SendErrorMessage(Lang.T("error.itemNotFound"));
+                return true;
+            }
+
+            var item = matchedItems[0];
+
+            if (!AutoFish.Config.BaitRewards.ContainsKey(item.type))
+            {
+                caller.SendErrorMessage(Lang.T("error.itemNotInBait", item.Name));
+                return true;
+            }
+
+            if (!int.TryParse(args.Parameters[2], out var minutes) || minutes < 1)
+            {
+                caller.SendErrorMessage("分钟数必须是大于 0 的整数！");
+                return true;
+            }
+
+            AutoFish.Config.BaitRewards[item.type].Minutes = minutes;
+            AutoFish.Config.Write();
+            caller.SendSuccessMessage(Lang.T("success.set.baitReward", item.Name, 
+                AutoFish.Config.BaitRewards[item.type].Count, minutes));
+            return true;
         }
 
         return false;

@@ -76,14 +76,14 @@ public partial class AutoFish
                 var toName = TShock.Utils.GetItemById(toType).Name;
                 Tools.SendGradientMessage(player,
                     Lang.T("protectBait.swap", fromName, toName, fromSlot, toSlot));
-                resetHook(hook);
+                ResetHook(hook);
                 return;
             }
             else //就剩下一个了
             {
                 var baitName = TShock.Utils.GetItemById(baitType).Name;
                 Tools.SendGradientMessage(player, Lang.T("protectBait.lastOne", baitName));
-                resetHook(hook);
+                ResetHook(hook);
                 player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
                 return;
             }
@@ -96,7 +96,7 @@ public partial class AutoFish
             if (!CanConsumeFish(player, playerData))
             {
                 player.SendInfoMessage(Lang.T("consumption.lackItem"));
-                resetHook(hook);
+                ResetHook(hook);
                 player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
                 return;
             }
@@ -162,7 +162,7 @@ public partial class AutoFish
 
         if (noCatch)
         {
-            resetHook(hook);
+            ResetHook(hook);
             return; //没抓到，不抬杆
         }
 
@@ -197,7 +197,7 @@ public partial class AutoFish
         //应该发一个带ai[1]然后直接销毁，就可以触发客户端的收取函数，而不是继续New。
         var origPos = hook.position;
         //往玩家的二十倍对角方向飞，常规方法无法销毁，粒子动画阻塞
-        var pos = calcNewPos(player, hook);
+        var pos = CalcNewPos(player, hook);
         hook.position = pos;
         player.SendData(PacketTypes.ProjectileNew, "", hook.whoAmI);
         //服务器的netMod为2
@@ -214,7 +214,7 @@ public partial class AutoFish
     }
 
 
-    public static FishingContext MyFishingCheck(Projectile hook)
+    private static FishingContext MyFishingCheck(Projectile hook)
     {
         FishingContext context = Projectile._context;
         if (hook.TryBuildFishingContext(context))
@@ -230,7 +230,7 @@ public partial class AutoFish
     }
 
 
-    private static Vector2 calcNewPos(TSPlayer player, Projectile hook)
+    private static Vector2 CalcNewPos(TSPlayer player, Projectile hook)
     {
         var playerPos = player.TPlayer.position;
         var hookPos = hook.position;
@@ -283,7 +283,7 @@ public partial class AutoFish
         player.SendData(PacketTypes.ProjectileNew, "", index);
     }
 
-    private static void resetHook(Projectile projectile)
+    private static void ResetHook(Projectile projectile)
     {
         //设置成没上鱼，无状态
         projectile.ai[1] = 0;

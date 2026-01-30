@@ -204,12 +204,18 @@ public partial class Commands
                         AutoFish.Config.ValuableBaitItemIds.Select(x =>
                             TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
                     return true;
-                case "list" when AutoFish.Config.BaitItemIds.Any():
-                    args.Player.SendInfoMessage(Lang.T("info.consumeListHeader") + string.Join(", ",
-                        AutoFish.Config.BaitItemIds.Select(x =>
-                            TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
-                    args.Player.SendSuccessMessage(Lang.T("info.exchangeRule", AutoFish.Config.BaitConsumeCount,
-                        AutoFish.Config.RewardDurationMinutes));
+                case "list" when AutoFish.Config.BaitRewards.Any():
+                    var sb = new StringBuilder();
+                    sb.Append(Lang.T("info.consumeListHeader"));
+                    foreach (var kvp in AutoFish.Config.BaitRewards.OrderByDescending(x => x.Value.Minutes))
+                    {
+                        var itemName = TShock.Utils.GetItemById(kvp.Key).Name;
+                        sb.AppendFormat(Lang.T("info.baitReward"), 
+                            $"[c/92C5EC:{itemName}]([c/AECDD1:{kvp.Key}])", 
+                            kvp.Value.Count, 
+                            kvp.Value.Minutes);
+                    }
+                    args.Player.SendInfoMessage(sb.ToString());
                     return true;
                 case "loot" when AutoFish.Config.ExtraCatchItemIds.Any():
                     args.Player.SendInfoMessage(Lang.T("info.extraLootHeader") + string.Join(", ",

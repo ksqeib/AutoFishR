@@ -69,29 +69,6 @@ public class SpawnProjectile
 
         if (Main.netMode != 0 && Owner == Main.myPlayer) NetMessage.SendData(27, -1, -1, null, num);
 
-        if (Owner == Main.myPlayer)
-        {
-            if (ProjectileID.Sets.IsAGolfBall[Type] && Damage <= 0)
-            {
-                var num3 = 0;
-                var num4 = 0;
-                var num5 = 99999999;
-                for (var j = 999; j > 0; j--)
-                    if (Main.projectile[j].active && ProjectileID.Sets.IsAGolfBall[Main.projectile[j].type] &&
-                        Main.projectile[j].owner == Owner && Main.projectile[j].damage <= 0)
-                    {
-                        num3++;
-                        if (num5 > Main.projectile[j].timeLeft)
-                        {
-                            num4 = j;
-                            num5 = Main.projectile[j].timeLeft;
-                        }
-                    }
-
-                if (num3 > 10) Main.projectile[num4].Kill();
-            }
-        }
-
         if (Owner == Main.myPlayer) Main.player[Owner].TryUpdateChannel(projectile);
 
         if (timeLeft > 0) projectile.timeLeft = timeLeft;

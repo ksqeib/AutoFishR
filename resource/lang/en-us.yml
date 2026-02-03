@@ -53,6 +53,7 @@ status.skipAnimation: "Skip animation: {0}"
 status.protectBait: "Protect valuable bait: {0}"
 status.consumptionEnabled: "Consumption mode: Enabled, remaining: {0}m {1}s"
 status.consumptionDisabled: "Consumption mode: Disabled"
+status.noEnabledFeatures: "No features currently enabled. Use /af to see available commands."
 
 warn.multiDisabled: "Multi Hook is not enabled globally; cannot toggle."
 warn.stackDisabled: "Skip non-stackable is not enabled globally; cannot toggle."

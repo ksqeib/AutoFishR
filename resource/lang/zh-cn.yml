@@ -53,6 +53,7 @@ status.skipAnimation: "跳过上鱼动画：{0}"
 status.protectBait: "保护贵重鱼饵：{0}"
 status.consumptionEnabled: "消耗模式：开启，剩余：{0}分{1}秒"
 status.consumptionDisabled: "消耗模式：关闭"
+status.noEnabledFeatures: "当前没有已开启的功能。使用 /af 查看可用命令。"
 
 warn.multiDisabled: "多钩功能未在全局开启，无法切换。"
 warn.stackDisabled: "过滤不可堆叠未在全局开启，无法切换。"

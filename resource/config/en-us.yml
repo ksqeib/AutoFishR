@@ -24,7 +24,7 @@ defaultMultiHookEnabled: false
 
 # Consumption mode: requires both global and personal toggles plus remaining time to auto fish / multi-hook.
 # Duration gain: consume bait configured in baitRewards, each bait type has different count and minutes.
-globalConsumptionModeEnabled: true
+globalConsumptionModeEnabled: false
 
 # Bait reward configuration: each bait can configure count (consume amount per use) and minutes (reward minutes)
 baitRewards:

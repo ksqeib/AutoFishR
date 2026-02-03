@@ -113,8 +113,7 @@ public partial class AutoFish
             var catchItem = false;
             //影子方法，获取物品啥的
             var context = MyFishingCheck(hook);
-
-
+            
             var catchId = hook.localAI[1];
 
             if (Config.RandomLootEnabled) catchId = Random.Shared.Next(1, ItemID.Count);

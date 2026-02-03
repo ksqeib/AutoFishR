@@ -82,33 +82,50 @@ public partial class Commands
     /// </summary>
     private static void SendStatus(TSPlayer player, AFPlayerData.ItemData playerData)
     {
-        var sb = new StringBuilder();
-        var onOff = new Func<bool, string>(v => v ? Lang.T("common.enabled") : Lang.T("common.disabled"));
+        var enabledFeatures = new List<string>();
 
-        sb.AppendLine(Lang.T("status.title"));
-        sb.AppendLine(Lang.T("status.autofish", onOff(playerData.AutoFishEnabled)));
-        sb.AppendLine(Lang.T("status.buff", onOff(playerData.BuffEnabled)));
-        sb.AppendLine(Lang.T("status.multihook", onOff(playerData.MultiHookEnabled), playerData.HookMaxNum));
-        sb.AppendLine(Lang.T("status.skipUnstackable", onOff(playerData.SkipNonStackableLoot)));
-        sb.AppendLine(Lang.T("status.blockMonster", onOff(playerData.BlockMonsterCatch)));
-        sb.AppendLine(Lang.T("status.skipAnimation", onOff(playerData.SkipFishingAnimation)));
-        sb.AppendLine(Lang.T("status.protectBait", onOff(playerData.ProtectValuableBaitEnabled)));
+        // 只添加已开启的功能
+        if (playerData.AutoFishEnabled)
+            enabledFeatures.Add(Lang.T("status.autofish", Lang.T("common.enabled")));
 
-        if (AutoFish.Config.BaitRewards.Any() || playerData.CanConsume())
+        if (playerData.BuffEnabled)
+            enabledFeatures.Add(Lang.T("status.buff", Lang.T("common.enabled")));
+
+        if (playerData.MultiHookEnabled)
+            enabledFeatures.Add(Lang.T("status.multihook", Lang.T("common.enabled"), playerData.HookMaxNum));
+
+        if (playerData.SkipNonStackableLoot)
+            enabledFeatures.Add(Lang.T("status.skipUnstackable", Lang.T("common.enabled")));
+
+        if (playerData.BlockMonsterCatch)
+            enabledFeatures.Add(Lang.T("status.blockMonster", Lang.T("common.enabled")));
+
+        if (playerData.SkipFishingAnimation)
+            enabledFeatures.Add(Lang.T("status.skipAnimation", Lang.T("common.enabled")));
+
+        if (playerData.ProtectValuableBaitEnabled)
+            enabledFeatures.Add(Lang.T("status.protectBait", Lang.T("common.enabled")));
+
+        if (AutoFish.Config.BaitRewards.Any() && playerData.CanConsume())
         {
-            string consumeLine;
-            if (playerData.CanConsume())
-            {
-                var (minutes, seconds) = playerData.GetRemainTime();
-                consumeLine = Lang.T("status.consumptionEnabled", minutes, seconds);
-            }
-            else
-            {
-                consumeLine = Lang.T("status.consumptionDisabled");
-            }
-            sb.AppendLine(consumeLine);
+            var (minutes, seconds) = playerData.GetRemainTime();
+            enabledFeatures.Add(Lang.T("status.consumptionEnabled", minutes, seconds));
         }
 
-        player.SendInfoMessage(sb.ToString());
+        // 发送彩色标题
+        Utils.Tools.SendGradientMessage(player, Lang.T("status.title"));
+
+        // 发送每个已开启的功能
+        if (enabledFeatures.Any())
+        {
+            foreach (var feature in enabledFeatures)
+            {
+                Utils.Tools.SendGradientMessage(player, feature);
+            }
+        }
+        else
+        {
+            player.SendInfoMessage(Lang.T("status.noEnabledFeatures"));
+        }
     }
 }

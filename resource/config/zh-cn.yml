@@ -24,7 +24,7 @@ defaultMultiHookEnabled: false
 
 # 消耗模式：需同时开启 global 与玩家个人开关且有剩余时长才会自动钓鱼/多钩。
 # 时长获取：消耗 baitRewards 中配置的鱼饵，每种鱼饵有不同的消耗数量和兑换时长。
-globalConsumptionModeEnabled: true
+globalConsumptionModeEnabled: false
 
 # 鱼饵兑换配置：每种鱼饵可配置 count（每次消耗数量）和 minutes（兑换分钟数）
 baitRewards:

@@ -75,7 +75,11 @@ valuableBaitItemIds:
   - 4362 # 金瓢虫
   - 4419 # 金水黾
   - 2895 # 金蠕虫
+# 启用自定义钓鱼规则：关闭后将不使用下方 customFishRules 中配置的自定义规则。
+enableCustomFishRules: true
 
+# 启用原版钓鱻规则：关闭后将不使用 Terraria 原版的钓鱻规则。
+enableVanillaFishRules: true
 # 自定义钓鱼规则：可自定义掉落物品、概率、稀有度和触发条件
 # 将原有的额外渔获物品转换为符合地点的自定义规则
 customFishRules:

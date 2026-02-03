@@ -117,6 +117,12 @@ internal class Configuration
         2895 // 金蠕虫
     };
 
+    /// <summary>启用自定义钓鱼规则。</summary>
+    public bool EnableCustomFishRules { get; set; } = true;
+
+    /// <summary>启用原版钓鱼规则。</summary>
+    public bool EnableVanillaFishRules { get; set; } = true;
+
     /// <summary>自定义钓鱼规则列表。</summary>
     public List<CustomFishDropRule> CustomFishRules { get; set; } = new();
 

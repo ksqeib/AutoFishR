@@ -20,10 +20,10 @@ public partial class AutoFish
     {
         var resultItemType = 0;
         //我们的
-        if (resultItemType == 0)
+        if (resultItemType == 0 && Config.EnableCustomFishRules)
             resultItemType = My_TryGetItemDropType(context, CustomRuleList);
         //原版的
-        if (resultItemType == 0)
+        if (resultItemType == 0 && Config.EnableVanillaFishRules)
             resultItemType = My_TryGetItemDropType(context, FishingConditionMapper.SystemRuleList);
         return resultItemType;
     }

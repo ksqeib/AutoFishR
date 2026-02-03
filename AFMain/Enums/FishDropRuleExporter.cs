@@ -137,6 +137,7 @@ public static class FishDropRuleExporter
         var sb = new StringBuilder();
         sb.AppendLine("# 钓鱼规则导出文件");
         sb.AppendLine("# 此文件由系统自动生成");
+        sb.AppendLine("# 由ksqeib的AutoFishR生成，其中无法匹配规则为任务鱼/特殊世界规则");
         sb.AppendLine();
         sb.AppendLine("rules:");
         

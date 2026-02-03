@@ -162,6 +162,9 @@ public partial class AutoFish : TerrariaPlugin
     /// </summary>
     private static void LoadCustomFishRules()
     {
+        // 清空现有的自定义规则列表
+        CustomRuleList._rules.Clear();
+
         if (Config.CustomFishRules == null || Config.CustomFishRules.Count == 0)
         {
             return;

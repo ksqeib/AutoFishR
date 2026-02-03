@@ -22,7 +22,7 @@ help.player.monster: "/af monster -- 开启丨关闭[c/F48FB1:不钓怪物]"
 help.player.anim: "/af anim -- 开启丨关闭[c/8EC4F4:跳过上鱼动画]"
 help.player.quest: "/af quest -- 开启丨关闭[c/F4D58D:屏蔽任务鱼]"
 help.player.list: "/af list -- 列出消耗模式[c/F5F251:指定物品表]"
-help.player.loot: "/af loot -- 查看[c/F25055:额外渔获表]"
+
 help.player.bait: "/af bait -- 开启丨关闭[c/92C5EC:保护贵重鱼饵]"
 help.player.baitlist: "/af baitlist -- 查看贵重鱼饵列表"
 help.admin.buff: "[全局] /afa buff -- 开启丨关闭全局钓鱼BUFF"
@@ -33,8 +33,7 @@ help.admin.set: "[全局] /afa set 物品名 数量 分钟 -- 设置鱼饵兑换
 help.admin.time: "[全局] /afa time 物品名 分钟 -- 修改鱼饵兑换时长"
 help.admin.add: "[全局] /afa add 物品名 数量 分钟 -- 添加指定鱼饵"
 help.admin.del: "[全局] /afa del 物品名 -- 移除指定鱼饵"
-help.admin.addloot: "[全局] /afa addloot 物品名 -- 添加额外渔获"
-help.admin.delloot: "[全局] /afa delloot 物品名 -- 移除额外渔获"
+
 help.admin.stack: "[全局] /afa stack -- 开启丨关闭过滤不可堆叠渔获"
 help.admin.monster: "[全局] /afa monster -- 开启丨关闭不钓怪物"
 help.admin.anim: "[全局] /afa anim -- 开启丨关闭跳过上鱼动画"
@@ -87,8 +86,7 @@ error.hookInvalidNumber: "请输入数字，格式：/af hook 数字"
 error.itemNotFound: "不存在该物品，“物品查询”: \"[c/92C5EC:https://terraria.wiki.gg/zh/wiki/Item_IDs]\""
 error.itemAlreadyInBait: "物品 [c/92C5EC:{0}] 已在指定鱼饵表中!"
 error.itemNotInBait: "物品 {0} 不在指定鱼饵表中!"
-error.itemAlreadyInLoot: "物品 [c/92C5EC:{0}] 已在额外渔获表中!"
-error.itemNotInLoot: "物品 {0} 不在额外渔获中!"
+
 
 success.toggle.fish: "玩家 [{0}] 已[c/92C5EC:{1}]自动钓鱼功能。"
 success.toggle.buff: "玩家 [{0}] 已[c/92C5EC:{1}]自动钓鱼BUFF"
@@ -109,12 +107,11 @@ suсcess.set.baitReward: "已设置鱼饵 [c/92C5EC:{0}] 的兑换规则：每{1
 success.set.multiMax: "已成功将多钓数量上限设置为: [c/92C5EC:{0}] 个！"
 success.item.addBait: "已成功将物品添加指定鱼饵表: [c/92C5EC:{0}]!"
 success.item.removeBait: "已成功从指定鱼饵表移出物品: [c/92C5EC:{0}]!"
-success.item.addLoot: "已成功将物品添加额外渔获表: [c/92C5EC:{0}]!"
-success.item.removeLoot: "已成功从额外渔获移出物品: [c/92C5EC:{0}]!"
+
 
 info.valuableListHeader: "[保护贵重鱼饵列表]\n"
 info.consumeListHeader: "[指定消耗物品表]\n"
-info.extraLootHeader: "[额外渔获表]\n"
+
 info.baitReward: "  {0}: 每{1}个 => {2}分钟\n"
 
 consumption.enabled: "玩家 [c/46C2D4:{0}] 已开启[c/F5F251:自动钓鱼] 消耗物品为:{1}"

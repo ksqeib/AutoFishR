@@ -27,8 +27,6 @@ public partial class Commands
             helpMessage.Append('\n').Append(Lang.T("help.admin.del"));
         }
 
-        helpMessage.Append('\n').Append(Lang.T("help.admin.addloot"));
-        helpMessage.Append('\n').Append(Lang.T("help.admin.delloot"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.stack"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.monster"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.anim"));
@@ -133,28 +131,6 @@ public partial class Commands
                     AutoFish.Config.BaitRewards.Remove(item.type);
                     AutoFish.Config.Write();
                     caller.SendSuccessMessage(Lang.T("success.item.removeBait", item.Name));
-                    return true;
-                case "addloot":
-                    if (AutoFish.Config.ExtraCatchItemIds.Contains(item.type))
-                    {
-                        caller.SendErrorMessage(Lang.T("error.itemAlreadyInLoot", item.Name));
-                        return true;
-                    }
-
-                    AutoFish.Config.ExtraCatchItemIds.Add(item.type);
-                    AutoFish.Config.Write();
-                    caller.SendSuccessMessage(Lang.T("success.item.addLoot", item.Name));
-                    return true;
-                case "delloot":
-                    if (!AutoFish.Config.ExtraCatchItemIds.Contains(item.type))
-                    {
-                        caller.SendErrorMessage(Lang.T("error.itemNotInLoot", item.Name));
-                        return true;
-                    }
-
-                    AutoFish.Config.ExtraCatchItemIds.Remove(item.type);
-                    AutoFish.Config.Write();
-                    caller.SendSuccessMessage(Lang.T("success.item.removeLoot", item.Name));
                     return true;
                 case "duo":
                     if (int.TryParse(args.Parameters[1], out var maxNum))

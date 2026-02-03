@@ -124,8 +124,6 @@ public partial class AutoFish
 
             var catchId = hook.localAI[1];
 
-            if (Config.RandomLootEnabled) catchId = Random.Shared.Next(1, ItemID.Count);
-
             if (context.Fisher.rolledEnemySpawn > 0) //抓到怪物
             {
                 if (blockMonsterCatch) continue; //不想抓怪物
@@ -139,17 +137,6 @@ public partial class AutoFish
                 catchItem = true;
                 noCatch = false;
             }
-
-            // 如果额外渔获有任何1个物品ID，则参与AI[1]
-            if (noCatch)
-                //钓额外渔获
-                if (Config.ExtraCatchItemIds.Any())
-                {
-                    catchId = Config.ExtraCatchItemIds[Main.rand.Next(Config.ExtraCatchItemIds.Count)];
-                    noCatch = false;
-                    catchItem = true;
-                }
-            //想给额外渔获加点怪物
 
             //抓到物品
             if (catchItem && skipNonStackableLoot) //不想抓不可堆叠堆叠物品

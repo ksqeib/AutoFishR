@@ -45,9 +45,6 @@ public partial class Commands
         if (AutoFish.Config.GlobalConsumptionModeEnabled)
             helpMessage.Append('\n').Append(Lang.T("help.player.list"));
 
-        if (AutoFish.Config.ExtraCatchItemIds.Count != 0)
-            helpMessage.Append('\n').Append(Lang.T("help.player.loot"));
-
         if (AutoFish.Config.GlobalProtectValuableBaitEnabled &&
             AutoFish.HasFeaturePermission(player, "bait.protect"))
         {
@@ -239,11 +236,6 @@ public partial class Commands
                     }
 
                     args.Player.SendInfoMessage(sb.ToString());
-                    return true;
-                case "loot" when AutoFish.Config.ExtraCatchItemIds.Any():
-                    args.Player.SendInfoMessage(Lang.T("info.extraLootHeader") + string.Join(", ",
-                        AutoFish.Config.ExtraCatchItemIds.Select(x =>
-                            TShock.Utils.GetItemById(x).Name + "([c/92C5EC:{0}])".SFormat(x))));
                     return true;
                 default:
                     return false;

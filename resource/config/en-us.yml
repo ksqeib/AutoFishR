@@ -76,15 +76,61 @@ valuableBaitItemIds:
   - 4419 # Gold Water Strider
   - 2895 # Gold Worm
 
-# Extra/random loot: triggers when base roll fails; randomLootEnabled=true picks any item ID, false draws from extraCatchItemIds.
-randomLootEnabled: false
-extraCatchItemIds:
-  - 5    # Mushroom
-  - 72   # Silver Coin
-  - 75   # Fallen Star
-  - 276  # Cactus
-  - 3093 # Herb Bag
-  - 4345 # Worm Can
+# Custom fishing rules: customize drop items, probability, rarity, and trigger conditions
+# Convert previous extra loot items to custom rules matching their locations
+customFishRules:
+  # Mushroom - small chance when fishing in forest or glowing mushroom biome
+  - possibleItems:
+      - 5
+    chanceNumerator: 1
+    chanceDenominator: 30
+    rarity: Common
+    conditions:
+      - Height1  # Surface
+
+  # Silver Coin - very small chance anywhere
+  - possibleItems:
+      - 72
+    chanceNumerator: 1
+    chanceDenominator: 50
+    rarity: Common
+    conditions: []
+
+  # Fallen Star - chance when fishing at sky/space layer
+  - possibleItems:
+      - 75
+    chanceNumerator: 1
+    chanceDenominator: 40
+    rarity: Uncommon
+    conditions:
+      - Height0  # Sky
+
+  # Cactus - only obtainable when fishing in desert
+  - possibleItems:
+      - 276
+    chanceNumerator: 1
+    chanceDenominator: 25
+    rarity: Common
+    conditions:
+      - Desert  # Desert
+
+  # Herb Bag - chance when fishing in jungle or surface
+  - possibleItems:
+      - 3093
+    chanceNumerator: 1
+    chanceDenominator: 35
+    rarity: Uncommon
+    conditions:
+      - Jungle  # Jungle
+
+  # Can of Worms - obtainable when fishing underground
+  - possibleItems:
+      - 4345
+    chanceNumerator: 1
+    chanceDenominator: 30
+    rarity: Common
+    conditions:
+      - Height2  # Underground
 
 # Buff table: key = Buff ID, value = duration in seconds; empty means no buff.
 buffDurations: {}

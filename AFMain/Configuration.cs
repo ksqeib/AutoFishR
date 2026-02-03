@@ -117,20 +117,6 @@ internal class Configuration
         2895 // 金蠕虫
     };
 
-    /// <summary>随机渔获功能开关。</summary>
-    public bool RandomLootEnabled { get; set; }
-
-    /// <summary>额外掉落的物品 ID 列表。</summary>
-    public List<int> ExtraCatchItemIds { get; set; } = new()
-    {
-        5, // 蘑菇
-        72, // 银币
-        75, // 坠落之星
-        276, // 仙人掌
-        3093, // 草药袋
-        4345 // 蠕虫罐头
-    };
-
     /// <summary>自定义钓鱼规则列表。</summary>
     public List<CustomFishDropRule> CustomFishRules { get; set; } = new();
 

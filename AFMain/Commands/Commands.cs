@@ -22,7 +22,7 @@ public partial class Commands
         if (isConsole)
         {
             player.SendInfoMessage(Lang.T("help.consoleUseAfa"));
-            return;
+            // 不再直接return，允许继续执行
         }
 
         var playerData = AutoFish.PlayerData.GetOrCreatePlayerData(player.Name, AutoFish.CreateDefaultPlayerData);
@@ -47,9 +47,8 @@ public partial class Commands
             return;
         }
 
-        if (!isConsole)
-            if (HandlePlayerCommand(args, playerData))
-                return;
+        if (HandlePlayerCommand(args, playerData))
+            return;
 
         HelpCmd(args.Player);
     }

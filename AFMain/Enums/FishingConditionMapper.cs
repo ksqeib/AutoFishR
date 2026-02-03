@@ -257,4 +257,13 @@ public static class FishingConditionMapper
         }
         return result;
     }
+
+    /// <summary>
+    ///     获取钓鱼条件的本地化显示名称。
+    /// </summary>
+    public static string GetLocalizedName(FishingConditionType conditionType)
+    {
+        var key = $"condition.{conditionType}";
+        return Lang.T(key);
+    }
 }

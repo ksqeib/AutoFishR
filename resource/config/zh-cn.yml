@@ -83,8 +83,8 @@ customFishRules:
   - possibleItems:
       - 5
     chanceNumerator: 1
-    chanceDenominator: 30
-    rarity: Common
+    chanceDenominator: 3
+    rarity: Any
     conditions:
       - Height1  # 地表
 
@@ -92,16 +92,16 @@ customFishRules:
   - possibleItems:
       - 72
     chanceNumerator: 1
-    chanceDenominator: 50
-    rarity: Common
+    chanceDenominator: 5
+    rarity: Any
     conditions: []
 
   # 坠落之星 - 在天空/高空钓鱼时有概率获得
   - possibleItems:
       - 75
     chanceNumerator: 1
-    chanceDenominator: 40
-    rarity: Uncommon
+    chanceDenominator: 4
+    rarity: Any
     conditions:
       - Height0  # 天空
 
@@ -109,8 +109,8 @@ customFishRules:
   - possibleItems:
       - 276
     chanceNumerator: 1
-    chanceDenominator: 25
-    rarity: Common
+    chanceDenominator: 2
+    rarity: Any
     conditions:
       - Desert  # 沙漠
 
@@ -118,8 +118,8 @@ customFishRules:
   - possibleItems:
       - 3093
     chanceNumerator: 1
-    chanceDenominator: 35
-    rarity: Uncommon
+    chanceDenominator: 3
+    rarity: Any
     conditions:
       - Jungle  # 丛林
 
@@ -127,8 +127,8 @@ customFishRules:
   - possibleItems:
       - 4345
     chanceNumerator: 1
-    chanceDenominator: 30
-    rarity: Common
+    chanceDenominator: 3
+    rarity: Any
     conditions:
       - Height2  # 地下
 

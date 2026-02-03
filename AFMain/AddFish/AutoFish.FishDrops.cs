@@ -8,53 +8,12 @@ public partial class AutoFish
 {
     public static readonly FishDropRuleList CustomRuleList = new();
 
-    public void AddFishRule(FishRarityCondition tier, int chanceNominator, int chanceDenominator, int[] itemTypes,
-        params AFishingCondition[] conditions)
-    {
-        FishDropRule rule = new FishDropRule
-        {
-            PossibleItems = itemTypes,
-            ChanceNumerator = chanceNominator,
-            ChanceDenominator = chanceDenominator,
-            Rarity = tier,
-            Conditions = conditions
-        };
-        CustomRuleList.Add(rule);
-    }
-
-    protected void AddFishRuleWithHardmode(FishRarityCondition tier, int chanceDenominator, int itemTypeEarly,
-        int itemTypeHard, params AFishingCondition[] conditions)
-    {
-        FishDropRule fishDropRule = new FishDropRule();
-        fishDropRule.PossibleItems = new int[1] { itemTypeEarly };
-        fishDropRule.ChanceNumerator = 1;
-        fishDropRule.ChanceDenominator = chanceDenominator;
-        fishDropRule.Rarity = tier;
-        fishDropRule.Conditions = FishingConditionMapper.Populator.Join(conditions,
-            FishingConditionMapper.GetCondition(FishingConditionType.EarlyMode));
-        FishDropRule rule = fishDropRule;
-        CustomRuleList.Add(rule);
-        fishDropRule = new FishDropRule();
-        fishDropRule.PossibleItems = new int[1] { itemTypeHard };
-        fishDropRule.ChanceNumerator = 1;
-        fishDropRule.ChanceDenominator = chanceDenominator;
-        fishDropRule.Rarity = tier;
-        fishDropRule.Conditions = FishingConditionMapper.Populator.Join(conditions,
-            FishingConditionMapper.GetCondition(FishingConditionType.HardMode));
-        FishDropRule rule2 = fishDropRule;
-        CustomRuleList.Add(rule2);
-    }
-
     public int my_TryGetItemDropType(
         On.Terraria.GameContent.FishDropRules.FishDropRuleList.orig_TryGetItemDropType orig,
         Terraria.GameContent.FishDropRules.FishDropRuleList self,
         FishingContext context)
     {
-        var resultItemType = 0;
-
-        //原版的
-        resultItemType = FishingConditionMapper.SystemRuleList.TryGetItemDropType(context);
-        return resultItemType;
+        return GetMyItemDropType(context);
     }
 
     public int GetMyItemDropType(FishingContext context)
@@ -62,11 +21,23 @@ public partial class AutoFish
         var resultItemType = 0;
         //我们的
         if (resultItemType == 0)
-            resultItemType = CustomRuleList.TryGetItemDropType(context);
+            resultItemType = My_TryGetItemDropType(context, CustomRuleList);
         //原版的
         if (resultItemType == 0)
-            resultItemType = FishingConditionMapper.SystemRuleList.TryGetItemDropType(context);
+            resultItemType = My_TryGetItemDropType(context, FishingConditionMapper.SystemRuleList);
         return resultItemType;
+    }
+
+    public int My_TryGetItemDropType(FishingContext context, FishDropRuleList ruleList) //没这个会导致无限递归
+    {
+        int resultItemType = 0;
+        for (int index = 0; index < ruleList._rules.Count; ++index)
+        {
+            if (ruleList._rules[index].Attempt(context, out resultItemType))
+                return resultItemType;
+        }
+
+        return 0;
     }
 
     //注册上去，做一个自己的RuleList就好了

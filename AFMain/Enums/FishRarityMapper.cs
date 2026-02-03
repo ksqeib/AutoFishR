@@ -123,4 +123,13 @@ public static class FishRarityMapper
     {
         return ReverseRarityMap.TryGetValue(rarityCondition, out rarityType);
     }
+
+    /// <summary>
+    ///     获取稀有度的本地化显示名称。
+    /// </summary>
+    public static string GetLocalizedName(FishRarityType rarityType)
+    {
+        var key = $"rarity.{rarityType}";
+        return Lang.T(key);
+    }
 }

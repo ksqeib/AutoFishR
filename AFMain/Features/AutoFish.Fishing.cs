@@ -39,6 +39,8 @@ public partial class AutoFish
                                 HasFeaturePermission(player, "filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
                                    HasFeaturePermission(player, "skipanimation");
+        var blockQuestFish = Config.GlobalBlockQuestFish &&
+                            HasFeaturePermission(player, "filter.quest");
         var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
                                   HasFeaturePermission(player, "bait.protect");
 
@@ -57,6 +59,7 @@ public partial class AutoFish
         skipNonStackableLoot &= playerData.SkipNonStackableLoot;
         blockMonsterCatch &= playerData.BlockMonsterCatch;
         skipFishingAnimation &= playerData.SkipFishingAnimation;
+        blockQuestFish &= playerData.BlockQuestFish;
         protectValuableBait &= playerData.ProtectValuableBaitEnabled;
 
         //负数时候为咬钩倒计时，说明上鱼了
@@ -87,8 +90,8 @@ public partial class AutoFish
                 player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
                 return;
             }
-        
-        
+
+
         // 正常状态下与消耗模式下启用自动钓鱼
         if (Config.GlobalConsumptionModeEnabled)
         {
@@ -111,9 +114,20 @@ public partial class AutoFish
         for (var count = 0; noCatch && count < dropLimit; count++)
         {
             var catchItem = false;
-            //影子方法，获取物品啥的
-            var context = MyFishingCheck(hook);
-            
+
+            FishingContext context = Projectile._context;
+            if (hook.TryBuildFishingContext(context))
+            {
+                //屏蔽任务鱼
+                if (blockQuestFish)
+                {
+                    context.Fisher.questFish = -1;
+                }
+                
+                hook.SetFishingCheckResults(ref context.Fisher);
+            }
+
+
             var catchId = hook.localAI[1];
 
             if (Config.RandomLootEnabled) catchId = Random.Shared.Next(1, ItemID.Count);

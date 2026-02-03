@@ -103,6 +103,9 @@ public partial class Commands
         if (playerData.SkipFishingAnimation)
             enabledFeatures.Add(Lang.T("status.skipAnimation", Lang.T("common.enabled")));
 
+        if (playerData.BlockQuestFish)
+            enabledFeatures.Add(Lang.T("status.blockQuestFish", Lang.T("common.enabled")));
+
         if (playerData.ProtectValuableBaitEnabled)
             enabledFeatures.Add(Lang.T("status.protectBait", Lang.T("common.enabled")));
 

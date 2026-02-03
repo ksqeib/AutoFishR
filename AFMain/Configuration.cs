@@ -89,6 +89,12 @@ internal class Configuration
     /// <summary>玩家默认是否跳过钓鱼动画。</summary>
     public bool DefaultSkipFishingAnimation { get; set; } = true;
 
+    /// <summary>全局屏蔽任务鱼。</summary>
+    public bool GlobalBlockQuestFish { get; set; } = true;
+
+    /// <summary>玩家默认是否屏蔽任务鱼。</summary>
+    public bool DefaultBlockQuestFish { get; set; } = true;
+
     /// <summary>全局保护贵重鱼饵。</summary>
     public bool GlobalProtectValuableBaitEnabled { get; set; } = true;
 

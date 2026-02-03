@@ -56,6 +56,10 @@ defaultBlockMonsterCatch: true
 globalSkipFishingAnimation: true
 defaultSkipFishingAnimation: true
 
+# Block quest fish: set questFish=-1 to avoid catching the daily quest fish.
+globalBlockQuestFish: true
+defaultBlockQuestFish: true
+
 # Protect valuable bait: try to move valuable bait to the end of the inventory to avoid consumption.
 globalProtectValuableBaitEnabled: true
 defaultProtectValuableBaitEnabled: true

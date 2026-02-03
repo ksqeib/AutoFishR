@@ -56,6 +56,10 @@ defaultBlockMonsterCatch: true
 globalSkipFishingAnimation: true
 defaultSkipFishingAnimation: true
 
+# 屏蔽任务鱼：设置 questFish=-1 避免钓到当日任务鱼。
+globalBlockQuestFish: true
+defaultBlockQuestFish: true
+
 # 保护贵重鱼饵：尝试把贵重鱼饵交换到背包尾部以避免被消耗。
 globalProtectValuableBaitEnabled: true
 defaultProtectValuableBaitEnabled: true

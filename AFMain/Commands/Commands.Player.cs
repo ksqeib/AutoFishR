@@ -39,6 +39,9 @@ public partial class Commands
             AutoFish.HasFeaturePermission(player, "skipanimation"))
             helpMessage.Append('\n').Append(Lang.T("help.player.anim"));
 
+        if (AutoFish.Config.GlobalBlockQuestFish && AutoFish.HasFeaturePermission(player, "filter.quest"))
+            helpMessage.Append('\n').Append(Lang.T("help.player.quest"));
+
         if (AutoFish.Config.GlobalConsumptionModeEnabled)
             helpMessage.Append('\n').Append(Lang.T("help.player.list"));
 
@@ -167,6 +170,25 @@ public partial class Commands
                         ? "common.enabledVerb"
                         : "common.disabledVerb");
                     args.Player.SendSuccessMessage(Lang.T("success.toggle.anim", args.Player.Name, animVerb));
+                    return true;
+                case "quest":
+                    if (!AutoFish.Config.GlobalBlockQuestFish)
+                    {
+                        args.Player.SendWarningMessage(Lang.T("warn.questDisabled"));
+                        return true;
+                    }
+
+                    if (!AutoFish.HasFeaturePermission(player, "filter.quest"))
+                    {
+                        args.Player.SendErrorMessage(Lang.T("error.noPermission.quest"));
+                        return true;
+                    }
+
+                    playerData.BlockQuestFish = !playerData.BlockQuestFish;
+                    var questVerb = Lang.T(playerData.BlockQuestFish
+                        ? "common.enabledVerb"
+                        : "common.disabledVerb");
+                    args.Player.SendSuccessMessage(Lang.T("success.toggle.quest", args.Player.Name, questVerb));
                     return true;
                 case "bait":
                     if (!AutoFish.Config.GlobalProtectValuableBaitEnabled)

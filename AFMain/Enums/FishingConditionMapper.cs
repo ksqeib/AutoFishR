@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria.GameContent.FishDropRules;
 
 namespace AutoFish.AFMain.Enums;
@@ -12,7 +13,38 @@ public static class FishingConditionMapper
     /// <summary>
     ///     静态的游戏内容钓鱼掉落规则填充器实例，用于访问所有钓鱼条件。
     /// </summary>
-    public static readonly AFishDropRulePopulator Populator = new GameContentFishDropPopulator(new FishDropRuleList());
+    public static readonly FishDropRuleList RuleList = new();
+    public static readonly GameContentFishDropPopulator Populator = new(RuleList);
+
+    /// <summary>
+    ///     静态构造函数，在类第一次被访问时自动调用一次，用于初始化钓鱼掉落规则。
+    /// </summary>
+    static FishingConditionMapper()
+    {
+        // 调用 Populate() 方法填充钓鱼掉落规则列表
+        Populator.Populate();
+        
+        // 构建反向映射字典（从 AFishingCondition 对象到枚举类型）
+        BuildReverseMap();
+    }
+
+    // 反向映射字典，用于从 AFishingCondition 对象查找对应的枚举
+    private static readonly Dictionary<AFishingCondition, FishingConditionType> ReverseConditionMap = new();
+
+    /// <summary>
+    ///     构建反向映射字典。
+    /// </summary>
+    private static void BuildReverseMap()
+    {
+        foreach (var kvp in ConditionMap)
+        {
+            var condition = kvp.Value();
+            if (!ReverseConditionMap.ContainsKey(condition))
+            {
+                ReverseConditionMap[condition] = kvp.Key;
+            }
+        }
+    }
 
     private static readonly Dictionary<FishingConditionType, Func<AFishingCondition>> ConditionMap = new()
     {
@@ -195,5 +227,34 @@ public static class FishingConditionMapper
             conditions[i] = GetCondition(conditionTypes[i]);
         }
         return conditions;
+    }
+
+    /// <summary>
+    ///     反向映射：从 AFishingCondition 对象获取对应的枚举类型。
+    /// </summary>
+    /// <param name="condition">钓鱼条件对象</param>
+    /// <param name="conditionType">输出的枚举类型</param>
+    /// <returns>如果找到映射返回 true，否则返回 false</returns>
+    public static bool TryGetConditionType(AFishingCondition condition, out FishingConditionType conditionType)
+    {
+        return ReverseConditionMap.TryGetValue(condition, out conditionType);
+    }
+
+    /// <summary>
+    ///     反向映射：从多个 AFishingCondition 对象获取对应的枚举类型列表，跳过无法映射的条件。
+    /// </summary>
+    public static List<FishingConditionType> GetConditionTypes(AFishingCondition[] conditions)
+    {
+        var result = new List<FishingConditionType>();
+        if (conditions == null) return result;
+
+        foreach (var condition in conditions)
+        {
+            if (TryGetConditionType(condition, out var type))
+            {
+                result.Add(type);
+            }
+        }
+        return result;
     }
 }

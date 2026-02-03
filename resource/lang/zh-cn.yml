@@ -38,11 +38,15 @@ help.admin.delloot: "[全局] /afa delloot 物品名 -- 移除额外渔获"
 help.admin.stack: "[全局] /afa stack -- 开启丨关闭过滤不可堆叠渔获"
 help.admin.monster: "[全局] /afa monster -- 开启丨关闭不钓怪物"
 help.admin.anim: "[全局] /afa anim -- 开启丨关闭跳过上鱼动画"
+help.admin.export: "[导出] /afa export <页码> -- 导出游戏钓鱼规则（分页）"
+help.admin.exportstats: "[导出] /afa exportstats -- 查看导出统计信息"
 
 af.promptEnable: "请输入该指令开启→: [c/92C5EC:/af fish]"
 af.remaining: "自动钓鱼[c/46C4D4:剩余时长]：[c/F3F292:{0}分{1}秒]"
 firstFishHint: "检测到你正在钓鱼，可使用 /af fish 开启自动钓鱼。"
 reload.done: "[自动钓鱼]重新加载配置完毕。"
+
+error.invalidPage: "页码必须是大于 0 的整数！"
 
 status.title: "[自动钓鱼个人状态]"
 status.autofish: "功能：{0}"

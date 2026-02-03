@@ -24,6 +24,24 @@ public static class FishRarityMapper
         { FishRarityType.UncommonOrCommon, () => AFishDropRulePopulator.Rarity.UncommonOrCommon }
     };
 
+    // 反向映射字典
+    private static readonly Dictionary<FishRarityCondition, FishRarityType> ReverseRarityMap = new();
+
+    /// <summary>
+    ///     静态构造函数，构建反向映射。
+    /// </summary>
+    static FishRarityMapper()
+    {
+        foreach (var kvp in RarityMap)
+        {
+            var rarity = kvp.Value();
+            if (!ReverseRarityMap.ContainsKey(rarity))
+            {
+                ReverseRarityMap[rarity] = kvp.Key;
+            }
+        }
+    }
+
     private static readonly Dictionary<string, FishRarityType> StringMap = new(StringComparer.OrdinalIgnoreCase)
     {
         { "Any", FishRarityType.Any },
@@ -93,5 +111,16 @@ public static class FishRarityMapper
     public static IEnumerable<string> GetAvailableRarityNames()
     {
         return StringMap.Keys;
+    }
+
+    /// <summary>
+    ///     反向映射：从 FishRarityCondition 对象获取对应的枚举类型。
+    /// </summary>
+    /// <param name="rarityCondition">稀有度条件对象</param>
+    /// <param name="rarityType">输出的枚举类型</param>
+    /// <returns>如果找到映射返回 true，否则返回 false</returns>
+    public static bool TryGetRarityType(FishRarityCondition rarityCondition, out FishRarityType rarityType)
+    {
+        return ReverseRarityMap.TryGetValue(rarityCondition, out rarityType);
     }
 }

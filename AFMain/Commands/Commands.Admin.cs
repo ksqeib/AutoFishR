@@ -1,10 +1,11 @@
 using System.Text;
+using AutoFish.AFMain.Enums;
 using TShockAPI;
 
 namespace AutoFish.AFMain;
 
 /// <summary>
-///     管理员侧指令处理。
+///     管理员侧指令处理�?
 /// </summary>
 public partial class Commands
 {
@@ -31,6 +32,8 @@ public partial class Commands
         helpMessage.Append('\n').Append(Lang.T("help.admin.stack"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.monster"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.anim"));
+        helpMessage.Append('\n').Append(Lang.T("help.admin.export"));
+        helpMessage.Append('\n').Append(Lang.T("help.admin.exportstats"));
     }
 
     private static bool HandleAdminCommand(CommandArgs args)
@@ -91,12 +94,28 @@ public partial class Commands
                             : "common.disabledVerb")));
                     AutoFish.Config.Write();
                     return true;
+                case "exportstats":
+                    ExportStatsCommand(caller);
+                    return true;
                 default:
                     return false;
             }
 
         if (args.Parameters.Count == 2)
         {
+            // 处理 export 命令
+            if (sub == "export")
+            {
+                var pageStr = args.Parameters[1];
+                if (!int.TryParse(pageStr, out var page) || page < 1)
+                {
+                    caller.SendErrorMessage(Lang.T("error.invalidPage"));
+                    return true;
+                }
+                ExportCommand(caller, page);
+                return true;
+            }
+
             var matchedItems = TShock.Utils.GetItemByIdOrName(args.Parameters[1]);
             if (matchedItems.Count > 1)
             {
@@ -186,7 +205,7 @@ public partial class Commands
                 case "set":
                     if (!int.TryParse(args.Parameters[2], out var count) || count < 1)
                     {
-                        caller.SendErrorMessage("数量必须是大于 0 的整数！");
+                        caller.SendErrorMessage("数量必须是大�?0 的整数！");
                         return true;
                     }
 
@@ -248,4 +267,115 @@ public partial class Commands
 
         return false;
     }
+
+    /// <summary>
+    ///     导出统计信息命令。
+    /// </summary>
+    private static void ExportStatsCommand(TSPlayer caller)
+    {
+        try
+        {
+            var stats = FishDropRuleExporter.GetStatistics();
+            
+            caller.SendSuccessMessage("=== 钓鱼规则导出统计 ===");
+            caller.SendInfoMessage($"总规则数: {stats.TotalRules}");
+            caller.SendInfoMessage($"完全匹配: {stats.FullyMappedRules} ({GetPercentage(stats.FullyMappedRules, stats.TotalRules)}%)");
+            caller.SendInfoMessage($"部分匹配: {stats.PartiallyMappedRules} ({GetPercentage(stats.PartiallyMappedRules, stats.TotalRules)}%)");
+            caller.SendInfoMessage($"无法映射: {stats.UnmappedRules} ({GetPercentage(stats.UnmappedRules, stats.TotalRules)}%)");
+            caller.SendInfoMessage($"使用 /afa export <页码> 查看详细规则");
+        }
+        catch (Exception ex)
+        {
+            caller.SendErrorMessage($"导出统计失败: {ex.Message}");
+            TShock.Log.Error($"导出统计失败: {ex}");
+        }
+    }
+
+    /// <summary>
+    ///     导出规则命令（分页显示）。
+    /// </summary>
+    private static void ExportCommand(TSPlayer caller, int page)
+    {
+        try
+        {
+            var rules = FishDropRuleExporter.ExportRules(skipPartiallyMapped: true);
+            
+            if (rules.Count == 0)
+            {
+                caller.SendInfoMessage("没有可导出的完全匹配规则。");
+                return;
+            }
+
+            const int pageSize = 5;
+            var totalPages = (rules.Count + pageSize - 1) / pageSize;
+            
+            if (page < 1 || page > totalPages)
+            {
+                caller.SendErrorMessage($"页码超出范围！总共 {totalPages} 页。");
+                return;
+            }
+
+            var startIndex = (page - 1) * pageSize;
+            var endIndex = Math.Min(startIndex + pageSize, rules.Count);
+            
+            caller.SendSuccessMessage($"=== 钓鱼规则导出 (第 {page}/{totalPages} 页) ===");
+            
+            for (var i = startIndex; i < endIndex; i++)
+            {
+                var rule = rules[i];
+                var sb = new StringBuilder();
+                
+                sb.Append($"[{i + 1}] 物品: ");
+                if (rule.PossibleItems.Length > 0)
+                {
+                    var itemNames = rule.PossibleItems
+                        .Select(id => TShock.Utils.GetItemById(id)?.Name ?? $"ID:{id}")
+                        .Take(3);
+                    sb.Append(string.Join(", ", itemNames));
+                    if (rule.PossibleItems.Length > 3)
+                        sb.Append($" ...共{rule.PossibleItems.Length}个");
+                }
+                else
+                {
+                    sb.Append("无");
+                }
+                
+                caller.SendInfoMessage(sb.ToString());
+                
+                sb.Clear();
+                sb.Append($"    概率: {rule.ChanceNumerator}/{rule.ChanceDenominator}");
+                if (rule.Rarity.HasValue)
+                    sb.Append($", 稀有度: {rule.Rarity.Value}");
+                caller.SendInfoMessage(sb.ToString());
+                
+                if (rule.Conditions.Count > 0)
+                {
+                    var conditions = string.Join(", ", rule.Conditions.Take(5));
+                    if (rule.Conditions.Count > 5)
+                        conditions += $" ...共{rule.Conditions.Count}个";
+                    caller.SendInfoMessage($"    条件: {conditions}");
+                }
+            }
+            
+            if (page < totalPages)
+            {
+                caller.SendInfoMessage($"使用 /afa export {page + 1} 查看下一页");
+            }
+        }
+        catch (Exception ex)
+        {
+            caller.SendErrorMessage($"导出规则失败: {ex.Message}");
+            TShock.Log.Error($"导出规则失败: {ex}");
+        }
+    }
+
+    /// <summary>
+    ///     计算百分比。
+    /// </summary>
+    private static double GetPercentage(int value, int total)
+    {
+        if (total == 0) return 0;
+        return Math.Round(value * 100.0 / total, 2);
+    }
 }
+

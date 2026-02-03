@@ -37,11 +37,15 @@ help.admin.delloot: "[Global] /afa delloot itemName -- Remove extra loot"
 help.admin.stack: "[Global] /afa stack -- Toggle filtering non-stackable loot"
 help.admin.monster: "[Global] /afa monster -- Toggle blocking monster catches"
 help.admin.anim: "[Global] /afa anim -- Toggle skipping fishing animation"
+help.admin.export: "[Export] /afa export <page> -- Export game fishing rules (paginated)"
+help.admin.exportstats: "[Export] /afa exportstats -- View export statistics"
 
 af.promptEnable: "Enter this command to enable ->: [c/92C5EC:/af fish]"
 af.remaining: "[c/46C4D4:Remaining AutoFish time]: [c/F3F292:{0}m {1}s]"
 firstFishHint: "Detected you are fishing; use /af fish to enable AutoFish."
 reload.done: "[AutoFish] Configuration reloaded."
+
+error.invalidPage: "Page number must be a positive integer!"
 
 status.title: "[AutoFish Personal Status]"
 status.autofish: "Feature: {0}"

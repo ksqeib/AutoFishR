@@ -6,7 +6,7 @@ namespace AutoFish.AFMain;
 
 public partial class AutoFish
 {
-    private List<FishDropRule> _myFishDropRules = [];
+    public static readonly FishDropRuleList RuleList = new();
 
     public void AddFishRule(FishRarityCondition tier, int chanceNominator, int chanceDenominator, int[] itemTypes,
         params AFishingCondition[] conditions)
@@ -19,7 +19,7 @@ public partial class AutoFish
             Rarity = tier,
             Conditions = conditions
         };
-        _myFishDropRules.Add(rule);
+        RuleList.Add(rule);
     }
 
     protected void AddFishRuleWithHardmode(FishRarityCondition tier, int chanceDenominator, int itemTypeEarly,
@@ -33,7 +33,7 @@ public partial class AutoFish
         fishDropRule.Conditions = FishingConditionMapper.Populator.Join(conditions,
             FishingConditionMapper.GetCondition(FishingConditionType.EarlyMode));
         FishDropRule rule = fishDropRule;
-        _myFishDropRules.Add(rule);
+        RuleList.Add(rule);
         fishDropRule = new FishDropRule();
         fishDropRule.PossibleItems = new int[1] { itemTypeHard };
         fishDropRule.ChanceNumerator = 1;
@@ -42,7 +42,7 @@ public partial class AutoFish
         fishDropRule.Conditions = FishingConditionMapper.Populator.Join(conditions,
             FishingConditionMapper.GetCondition(FishingConditionType.HardMode));
         FishDropRule rule2 = fishDropRule;
-        _myFishDropRules.Add(rule2);
+        RuleList.Add(rule2);
     }
 
     public int my_TryGetItemDropType(
@@ -51,17 +51,32 @@ public partial class AutoFish
         FishingContext context)
     {
         var resultItemType = 0;
-        return _myFishDropRules.Any(t => t.Attempt(context, out resultItemType)) ? resultItemType : orig(self, context);
+
+        //原版的
+        resultItemType = FishingConditionMapper.RuleList.TryGetItemDropType(context);
+        return resultItemType;
+    }
+
+    public int GetMyItemDropType(FishingContext context)
+    {
+        var resultItemType = 0;
+        //我们的
+        if (resultItemType == 0)
+            resultItemType = RuleList.TryGetItemDropType(context);
+        //原版的
+        if (resultItemType == 0)
+            resultItemType = FishingConditionMapper.RuleList.TryGetItemDropType(context);
+        return resultItemType;
     }
 
     //注册上去，做一个自己的RuleList就好了
     public void RegisterToFishDB()
     {
-        On.Terraria.GameContent.FishDropRules.FishDropRuleList.TryGetItemDropType += my_TryGetItemDropType;
+        // On.Terraria.GameContent.FishDropRules.FishDropRuleList.TryGetItemDropType += my_TryGetItemDropType;
     }
 
     public void UnRegisterToFishDB()
     {
-        On.Terraria.GameContent.FishDropRules.FishDropRuleList.TryGetItemDropType -= my_TryGetItemDropType;
+        // On.Terraria.GameContent.FishDropRules.FishDropRuleList.TryGetItemDropType -= my_TryGetItemDropType;
     }
 }

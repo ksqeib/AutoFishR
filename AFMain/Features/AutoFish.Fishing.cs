@@ -2,7 +2,6 @@ using AutoFish.Utils;
 using Terraria;
 using Terraria.GameContent.FishDropRules;
 using Terraria.ID;
-using TerrariaApi.Server;
 using TShockAPI;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -40,7 +39,7 @@ public partial class AutoFish
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
                                    HasFeaturePermission(player, "skipanimation");
         var blockQuestFish = Config.GlobalBlockQuestFish &&
-                            HasFeaturePermission(player, "filter.quest");
+                             HasFeaturePermission(player, "filter.quest");
         var protectValuableBait = Config.GlobalProtectValuableBaitEnabled &&
                                   HasFeaturePermission(player, "bait.protect");
 
@@ -94,7 +93,6 @@ public partial class AutoFish
 
         // 正常状态下与消耗模式下启用自动钓鱼
         if (Config.GlobalConsumptionModeEnabled)
-        {
             //消耗模式判定
             if (!CanConsumeFish(player, playerData))
             {
@@ -103,7 +101,6 @@ public partial class AutoFish
                 player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
                 return;
             }
-        }
 
         //修改钓鱼得到的东西
         //获得钓鱼物品方法
@@ -115,15 +112,12 @@ public partial class AutoFish
         {
             var catchItem = false;
 
-            FishingContext context = Projectile._context;
+            var context = Projectile._context;
             if (hook.TryBuildFishingContext(context))
             {
                 //屏蔽任务鱼
-                if (blockQuestFish)
-                {
-                    context.Fisher.questFish = -1;
-                }
-                
+                if (blockQuestFish) context.Fisher.questFish = -1;
+
                 hook.SetFishingCheckResults(ref context.Fisher);
             }
 
@@ -148,7 +142,6 @@ public partial class AutoFish
 
             // 如果额外渔获有任何1个物品ID，则参与AI[1]
             if (noCatch)
-            {
                 //钓额外渔获
                 if (Config.ExtraCatchItemIds.Any())
                 {
@@ -156,7 +149,6 @@ public partial class AutoFish
                     noCatch = false;
                     catchItem = true;
                 }
-            }
             //想给额外渔获加点怪物
 
             //抓到物品
@@ -229,14 +221,11 @@ public partial class AutoFish
 
     private static FishingContext MyFishingCheck(Projectile hook)
     {
-        FishingContext context = Projectile._context;
+        var context = Projectile._context;
         if (hook.TryBuildFishingContext(context))
         {
-            int num = (context.Fisher.fishingLevel + 75) / 2;
-            if (Main.rand.Next(100) <= num)
-            {
-                hook.SetFishingCheckResults(ref context.Fisher);
-            }
+            var num = (context.Fisher.fishingLevel + 75) / 2;
+            if (Main.rand.Next(100) <= num) hook.SetFishingCheckResults(ref context.Fisher);
         }
 
         return context;
@@ -248,16 +237,13 @@ public partial class AutoFish
         var playerPos = player.TPlayer.position;
         var hookPos = hook.position;
 
-        Vector2 direction = hookPos - playerPos;
+        var direction = hookPos - playerPos;
 
         // 3. 获取当前的实际距离
-        float distance = direction.Length();
+        var distance = direction.Length();
 
         // 4. 异常处理：如果距离为0（重合），无法确定方向，直接返回玩家坐标
-        if (distance == 0f)
-        {
-            return playerPos;
-        }
+        if (distance == 0f) return playerPos;
 
         // 5. 归一化向量 (Normalize)
         // 这会将向量的长度变为 1，但方向保持不变。
@@ -266,15 +252,10 @@ public partial class AutoFish
 
         // 6. 限制距离范围 (Clamp)
         // 我们只想要 900 到 3000 之间的长度
-        float targetDistance = distance; // 默认使用原距离
+        var targetDistance = distance; // 默认使用原距离
         if (targetDistance < 900f)
-        {
             targetDistance = 1000f;
-        }
-        else if (targetDistance > 3000f)
-        {
-            targetDistance = 2000f;
-        }
+        else if (targetDistance > 3000f) targetDistance = 2000f;
 
         // 如果在中间，就保持原样不动
         // 7. 计算最终坐标

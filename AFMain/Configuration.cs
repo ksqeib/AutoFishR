@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using TShockAPI;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using TShockAPI;
 
 namespace AutoFish.AFMain;
 
@@ -58,17 +58,17 @@ internal class Configuration
     public bool GlobalConsumptionModeEnabled { get; set; }
 
     /// <summary>
-    /// 消耗模式鱼饵配置。
-    /// 键：鱼饵物品ID
-    /// 值：Tuple<每次消耗数量, 兑换分钟数>
+    ///     消耗模式鱼饵配置。
+    ///     键：鱼饵物品ID
+    ///     值：Tuple<每次消耗数量, 兑换分钟数>
     /// </summary>
     public Dictionary<int, BaitReward> BaitRewards { get; set; } = new()
     {
-        { 2002, new BaitReward { Count = 1, Minutes = 1 } },   // 蠣虫
-        { 2675, new BaitReward { Count = 1, Minutes = 5 } },   // 熟手诱饵
-        { 2676, new BaitReward { Count = 1, Minutes = 10 } },  // 大师诱饵
-        { 3191, new BaitReward { Count = 1, Minutes = 8 } },   // 附魔夜行者
-        { 3194, new BaitReward { Count = 1, Minutes = 5 } }    // 蝗虫
+        { 2002, new BaitReward { Count = 1, Minutes = 1 } }, // 蠣虫
+        { 2675, new BaitReward { Count = 1, Minutes = 5 } }, // 熟手诱饵
+        { 2676, new BaitReward { Count = 1, Minutes = 10 } }, // 大师诱饵
+        { 3191, new BaitReward { Count = 1, Minutes = 8 } }, // 附魔夜行者
+        { 3194, new BaitReward { Count = 1, Minutes = 5 } } // 蝗虫
     };
 
     /// <summary>全局跳过不可堆叠渔获。</summary>
@@ -114,7 +114,7 @@ internal class Configuration
         2893, // 金蚱蜢
         4362, // 金瓢虫
         4419, // 金水黾
-        2895  // 金蠕虫
+        2895 // 金蠕虫
     };
 
     /// <summary>随机渔获功能开关。</summary>
@@ -123,17 +123,17 @@ internal class Configuration
     /// <summary>额外掉落的物品 ID 列表。</summary>
     public List<int> ExtraCatchItemIds { get; set; } = new()
     {
-        5,    // 蘑菇
-        72,   // 银币
-        75,   // 坠落之星
-        276,  // 仙人掌
+        5, // 蘑菇
+        72, // 银币
+        75, // 坠落之星
+        276, // 仙人掌
         3093, // 草药袋
-        4345  // 蠕虫罐头
+        4345 // 蠕虫罐头
     };
 
     /// <summary>Buff ID 与持续秒数映射。</summary>
     public Dictionary<int, int> BuffDurations { get; set; } = new();
-    
+
 
     /// <summary>
     ///     将当前配置写入磁盘。
@@ -205,16 +205,10 @@ internal class Configuration
         var resourceName = assembly.GetManifestResourceNames()
             .FirstOrDefault(n => n.EndsWith($"{culture}.yml", StringComparison.OrdinalIgnoreCase));
 
-        if (resourceName == null)
-        {
-            return false;
-        }
+        if (resourceName == null) return false;
 
         using var resourceStream = assembly.GetManifestResourceStream(resourceName);
-        if (resourceStream == null)
-        {
-            return false;
-        }
+        if (resourceStream == null) return false;
 
         using var reader = new StreamReader(resourceStream);
         var content = reader.ReadToEnd();
@@ -227,28 +221,22 @@ internal class Configuration
         var uiCulture = CultureInfo.CurrentUICulture;
         var name = uiCulture.Name.ToLowerInvariant();
 
-        if (name.StartsWith("zh"))
-        {
-            return "zh-cn";
-        }
+        if (name.StartsWith("zh")) return "zh-cn";
 
-        if (name.StartsWith("en"))
-        {
-            return "en-us";
-        }
+        if (name.StartsWith("en")) return "en-us";
 
         return "en-us";
     }
 }
 
 /// <summary>
-/// 鱼饵奖励配置。
+///     鱼饵奖励配置。
 /// </summary>
 public class BaitReward
 {
     /// <summary>每次消耗的鱼饵数量。</summary>
     public int Count { get; set; }
-    
+
     /// <summary>兑换的时长（分钟）。</summary>
     public int Minutes { get; set; }
 }

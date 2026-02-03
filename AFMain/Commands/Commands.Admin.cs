@@ -196,10 +196,10 @@ public partial class Commands
                         return true;
                     }
 
-                    AutoFish.Config.BaitRewards[item.type] = new BaitReward 
-                    { 
-                        Count = count, 
-                        Minutes = minutes 
+                    AutoFish.Config.BaitRewards[item.type] = new BaitReward
+                    {
+                        Count = count,
+                        Minutes = minutes
                     };
                     AutoFish.Config.Write();
                     caller.SendSuccessMessage(Lang.T("success.set.baitReward", item.Name, count, minutes));
@@ -241,7 +241,7 @@ public partial class Commands
 
             AutoFish.Config.BaitRewards[item.type].Minutes = minutes;
             AutoFish.Config.Write();
-            caller.SendSuccessMessage(Lang.T("success.set.baitReward", item.Name, 
+            caller.SendSuccessMessage(Lang.T("success.set.baitReward", item.Name,
                 AutoFish.Config.BaitRewards[item.type].Count, minutes));
             return true;
         }

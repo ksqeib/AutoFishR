@@ -232,11 +232,12 @@ public partial class Commands
                     foreach (var kvp in AutoFish.Config.BaitRewards.OrderByDescending(x => x.Value.Minutes))
                     {
                         var itemName = TShock.Utils.GetItemById(kvp.Key).Name;
-                        sb.AppendFormat(Lang.T("info.baitReward"), 
-                            $"[c/92C5EC:{itemName}]([c/AECDD1:{kvp.Key}])", 
-                            kvp.Value.Count, 
+                        sb.AppendFormat(Lang.T("info.baitReward"),
+                            $"[c/92C5EC:{itemName}]([c/AECDD1:{kvp.Key}])",
+                            kvp.Value.Count,
                             kvp.Value.Minutes);
                     }
+
                     args.Player.SendInfoMessage(sb.ToString());
                     return true;
                 case "loot" when AutoFish.Config.ExtraCatchItemIds.Any():
@@ -278,7 +279,8 @@ public partial class Commands
 
                     if (personalMax > AutoFish.Config.GlobalMultiHookMaxNum)
                     {
-                        args.Player.SendWarningMessage(Lang.T("warn.hookLimited", AutoFish.Config.GlobalMultiHookMaxNum));
+                        args.Player.SendWarningMessage(
+                            Lang.T("warn.hookLimited", AutoFish.Config.GlobalMultiHookMaxNum));
                         personalMax = AutoFish.Config.GlobalMultiHookMaxNum;
                     }
 

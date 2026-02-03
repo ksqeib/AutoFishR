@@ -1,5 +1,5 @@
-using System.Text;
 using AutoFish.Data;
+using AutoFish.Utils;
 using TShockAPI;
 
 namespace AutoFish.AFMain;
@@ -32,7 +32,9 @@ public partial class Commands
             if (!isConsole)
             {
                 if (!playerData.AutoFishEnabled)
+                {
                     args.Player.SendSuccessMessage(Lang.T("af.promptEnable"));
+                }
 
                 //开启了消耗模式
                 else if (playerData.CanConsume())
@@ -116,19 +118,13 @@ public partial class Commands
         }
 
         // 发送彩色标题
-        Utils.Tools.SendGradientMessage(player, Lang.T("status.title"));
+        Tools.SendGradientMessage(player, Lang.T("status.title"));
 
         // 发送每个已开启的功能
         if (enabledFeatures.Any())
-        {
             foreach (var feature in enabledFeatures)
-            {
-                Utils.Tools.SendGradientMessage(player, feature);
-            }
-        }
+                Tools.SendGradientMessage(player, feature);
         else
-        {
             player.SendInfoMessage(Lang.T("status.noEnabledFeatures"));
-        }
     }
 }

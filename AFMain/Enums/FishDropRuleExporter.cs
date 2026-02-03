@@ -190,54 +190,167 @@ public static class FishDropRuleExporter
     }
 
     /// <summary>
+    ///     需要添加Stopper的特殊条件类型（不包括AnyEnemies，它作为默认头部Stopper）。
+    /// </summary>
+    private static readonly HashSet<FishingConditionType> StopperConditions = new()
+    {
+        FishingConditionType.InLava,
+        FishingConditionType.InHoney,
+        FishingConditionType.Junk,
+        FishingConditionType.Crate,
+        FishingConditionType.Ocean
+    };
+
+    /// <summary>
     ///     从配置文件加载自定义规则到 RuleList。
+    ///     会按照特殊区域分组，并在每组后添加 Stopper 以匹配游戏原版逻辑。
     /// </summary>
     public static int LoadCustomRulesToList(List<CustomFishDropRule> customRules, FishDropRuleList targetList)
     {
         int loadedCount = 0;
 
+        // 首先添加 AnyEnemies 的默认头部 Stopper（如果有怪物生成就不进行规则匹配）
+        var anyEnemiesCondition = FishingConditionMapper.GetCondition(FishingConditionType.AnyEnemies);
+        if (anyEnemiesCondition != null)
+        {
+            var anyEnemiesStopper = new FishDropRule
+            {
+                PossibleItems = Array.Empty<int>(),
+                ChanceNumerator = 1,
+                ChanceDenominator = 1,
+                Rarity = AFishDropRulePopulator.Rarity.Any,
+                Conditions = new[] { anyEnemiesCondition }
+            };
+            targetList._rules.Add(anyEnemiesStopper);
+            TShock.Log.ConsoleInfo("[AutoFish] 已添加 AnyEnemies 默认头部 Stopper");
+        }
+
+        // 使用特殊的键类型来分组（-1表示没有特殊条件）
+        var groupedRules = new Dictionary<int, List<(CustomFishDropRule rule, List<AFishingCondition> conditions)>>();
+        
         foreach (var customRule in customRules)
         {
             try
             {
-                // 解析稀有度
-                FishRarityCondition? rarity = null;
-                if (!string.IsNullOrEmpty(customRule.Rarity))
-                {
-                    rarity = FishRarityMapper.GetRarityConditionFromString(customRule.Rarity);
-                }
-
                 // 解析条件
                 var conditions = new List<AFishingCondition>();
+                FishingConditionType? stopperCondition = null;
+                
                 foreach (var conditionStr in customRule.Conditions)
                 {
                     var condition = FishingConditionMapper.GetConditionFromString(conditionStr);
                     if (condition != null)
                     {
                         conditions.Add(condition);
+                        
+                        // 检查是否包含特殊条件
+                        if (FishingConditionMapper.TryGetConditionType(condition, out var conditionType))
+                        {
+                            if (StopperConditions.Contains(conditionType))
+                            {
+                                // 优先级：AnyEnemies > InLava > InHoney > Junk > Crate > Ocean
+                                if (stopperCondition == null || GetStopperPriority(conditionType) < GetStopperPriority(stopperCondition.Value))
+                                {
+                                    stopperCondition = conditionType;
+                                }
+                            }
+                        }
                     }
                 }
 
-                // 创建游戏规则
-                var gameRule = new FishDropRule
+                // 按特殊条件分组（没有特殊条件的归为-1组）
+                int groupKey = stopperCondition.HasValue ? (int)stopperCondition.Value : -1;
+                if (!groupedRules.ContainsKey(groupKey))
                 {
-                    PossibleItems = customRule.PossibleItems.ToArray(),
-                    ChanceNumerator = customRule.ChanceNumerator,
-                    ChanceDenominator = customRule.ChanceDenominator,
-                    Rarity = rarity ?? AFishDropRulePopulator.Rarity.Common,
-                    Conditions = conditions.ToArray()
-                };
-
-                targetList._rules.Add(gameRule);
-                loadedCount++;
+                    groupedRules[groupKey] = new List<(CustomFishDropRule, List<AFishingCondition>)>();
+                }
+                groupedRules[groupKey].Add((customRule, conditions));
             }
             catch (Exception ex)
             {
-                TShock.Log.Error($"加载自定义钓鱼规则失败: {ex.Message}");
+                TShock.Log.Error($"解析自定义钓鱼规则失败: {ex.Message}");
+            }
+        }
+
+        // 按优先级顺序处理各组（特殊条件组优先）
+        var orderedGroups = groupedRules
+            .OrderBy(kvp => kvp.Key == -1 ? int.MaxValue : GetStopperPriority((FishingConditionType)kvp.Key));
+
+        foreach (var group in orderedGroups)
+        {
+            var groupKey = group.Key;
+            var rulesInGroup = group.Value;
+
+            // 加载该组的所有规则
+            foreach (var (customRule, conditions) in rulesInGroup)
+            {
+                try
+                {
+                    // 解析稀有度
+                    FishRarityCondition? rarity = null;
+                    if (!string.IsNullOrEmpty(customRule.Rarity))
+                    {
+                        rarity = FishRarityMapper.GetRarityConditionFromString(customRule.Rarity);
+                    }
+
+                    // 创建游戏规则
+                    var gameRule = new FishDropRule
+                    {
+                        PossibleItems = customRule.PossibleItems.ToArray(),
+                        ChanceNumerator = customRule.ChanceNumerator,
+                        ChanceDenominator = customRule.ChanceDenominator,
+                        Rarity = rarity ?? AFishDropRulePopulator.Rarity.Common,
+                        Conditions = conditions.ToArray()
+                    };
+
+                    targetList._rules.Add(gameRule);
+                    loadedCount++;
+                }
+                catch (Exception ex)
+                {
+                    TShock.Log.Error($"加载自定义钓鱼规则失败: {ex.Message}");
+                }
+            }
+
+            // 如果该组有特殊条件，添加 Stopper
+            if (groupKey != -1)
+            {
+                var stopperConditionType = (FishingConditionType)groupKey;
+                var stopperConditionInstance = FishingConditionMapper.GetCondition(stopperConditionType);
+                if (stopperConditionInstance != null)
+                {
+                    var stopper = new FishDropRule
+                    {
+                        PossibleItems = Array.Empty<int>(),  // 空物品列表表示这是一个 Stopper
+                        ChanceNumerator = 1,
+                        ChanceDenominator = 1,
+                        Rarity = AFishDropRulePopulator.Rarity.Any,
+                        Conditions = new[] { stopperConditionInstance }
+                    };
+                    targetList._rules.Add(stopper);
+                    
+                    TShock.Log.ConsoleInfo($"[AutoFish] 为条件 {stopperConditionType} 添加了 Stopper");
+                }
             }
         }
 
         return loadedCount;
+    }
+
+    /// <summary>
+    ///     获取特殊条件的优先级（数值越小优先级越高）。
+    /// </summary>
+    private static int GetStopperPriority(FishingConditionType conditionType)
+    {
+        return conditionType switch
+        {
+            FishingConditionType.InLava => 0,
+            FishingConditionType.InHoney => 1,
+            FishingConditionType.Junk => 2,
+            FishingConditionType.Crate => 3,
+            FishingConditionType.Ocean => 4,
+            _ => int.MaxValue
+        };
     }
 }
 

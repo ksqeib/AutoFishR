@@ -35,7 +35,7 @@ public partial class AutoFish : TerrariaPlugin
     public override string Author => "ksqeib 羽学 少司命";
 
     /// <summary>插件版本。</summary>
-    public override Version Version => new(1, 4, 6);
+    public override Version Version => new(1, 4, 7);
 
     /// <summary>插件描述。</summary>
     public override string Description => "青山常伴绿水，燕雀已是南飞";

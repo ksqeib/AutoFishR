@@ -13,8 +13,8 @@ public static class FishingConditionMapper
     /// <summary>
     ///     静态的游戏内容钓鱼掉落规则填充器实例，用于访问所有钓鱼条件。
     /// </summary>
-    public static readonly FishDropRuleList RuleList = new();
-    public static readonly GameContentFishDropPopulator Populator = new(RuleList);
+    public static readonly FishDropRuleList SystemRuleList = new();
+    public static readonly GameContentFishDropPopulator Populator = new(SystemRuleList);
 
     /// <summary>
     ///     静态构造函数，在类第一次被访问时自动调用一次，用于初始化钓鱼掉落规则。

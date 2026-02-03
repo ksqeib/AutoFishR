@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Terraria.GameContent.FishDropRules;
+using TShockAPI;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace AutoFish.AFMain.Enums;
 
@@ -40,9 +44,9 @@ public static class FishDropRuleExporter
     ///     从 FishDropRuleList 导出所有规则，跳过无法完全映射的规则。
     /// </summary>
     /// <param name="skipPartiallyMapped">是否跳过部分映射的规则（默认 true）</param>
-    public static List<ExportedFishDropRule> ExportRules(bool skipPartiallyMapped = true)
+    public static List<ExportedFishDropRule> ExportSystemRules(bool skipPartiallyMapped = true)
     {
-        var ruleList = FishingConditionMapper.RuleList;
+        var ruleList = FishingConditionMapper.SystemRuleList;
         return ExportRules(ruleList, skipPartiallyMapped);
     }
 
@@ -106,7 +110,7 @@ public static class FishDropRuleExporter
     /// </summary>
     public static ExportStatistics GetStatistics()
     {
-        var allRules = ExportRules(skipPartiallyMapped: false);
+        var allRules = ExportSystemRules(skipPartiallyMapped: false);
         
         return new ExportStatistics
         {
@@ -115,6 +119,124 @@ public static class FishDropRuleExporter
             PartiallyMappedRules = allRules.Count(r => !r.IsFullyMapped && r.Conditions.Count > 0),
             UnmappedRules = allRules.Count(r => r.Conditions.Count == 0 && r.UnmappedConditionsCount > 0)
         };
+    }
+
+    /// <summary>
+    ///     导出规则到 YAML 文件。
+    /// </summary>
+    public static void ExportToYamlFile(string filePath, bool skipPartiallyMapped = true)
+    {
+        var rules = ExportSystemRules(skipPartiallyMapped);
+        var stats = GetStatistics();
+        
+        var serializer = new SerializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithIndentedSequences()
+            .Build();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("# 钓鱼规则导出文件");
+        sb.AppendLine("# 此文件由系统自动生成");
+        sb.AppendLine();
+        sb.AppendLine("rules:");
+        
+        foreach (var rule in rules)
+        {
+            sb.AppendLine("  - possibleItems:");
+            foreach (var itemId in rule.PossibleItems)
+            {
+                var itemName = TShock.Utils.GetItemById(itemId)?.Name ?? $"Unknown({itemId})";
+                sb.AppendLine($"      - {itemId} # {itemName}");
+            }
+            sb.AppendLine($"    chanceNumerator: {rule.ChanceNumerator}");
+            sb.AppendLine($"    chanceDenominator: {rule.ChanceDenominator}");
+            
+            if (rule.Rarity.HasValue)
+            {
+                sb.AppendLine($"    rarity: {FishRarityMapper.ToString(rule.Rarity.Value)}");
+            }
+            
+            if (rule.Conditions.Count > 0)
+            {
+                sb.AppendLine("    conditions:");
+                foreach (var condition in rule.Conditions)
+                {
+                    sb.AppendLine($"      - {FishingConditionMapper.ToString(condition)}");
+                }
+            }
+            sb.AppendLine();
+        }
+
+        // 添加统计信息
+        sb.AppendLine();
+        sb.AppendLine("# ====== 导出统计报告 ======");
+        sb.AppendLine($"# 总规则数: {stats.TotalRules}");
+        sb.AppendLine($"# 完全匹配: {stats.FullyMappedRules} ({GetPercentage(stats.FullyMappedRules, stats.TotalRules)}%)");
+        sb.AppendLine($"# 部分匹配: {stats.PartiallyMappedRules} ({GetPercentage(stats.PartiallyMappedRules, stats.TotalRules)}%)");
+        sb.AppendLine($"# 无法映射: {stats.UnmappedRules} ({GetPercentage(stats.UnmappedRules, stats.TotalRules)}%)");
+        sb.AppendLine($"# 已导出: {rules.Count} 条规则");
+
+        File.WriteAllText(filePath, sb.ToString());
+    }
+
+    /// <summary>
+    ///     计算百分比。
+    /// </summary>
+    private static double GetPercentage(int value, int total)
+    {
+        if (total == 0) return 0;
+        return Math.Round(value * 100.0 / total, 2);
+    }
+
+    /// <summary>
+    ///     从配置文件加载自定义规则到 RuleList。
+    /// </summary>
+    public static int LoadCustomRulesToList(List<CustomFishDropRule> customRules, FishDropRuleList targetList)
+    {
+        int loadedCount = 0;
+
+        foreach (var customRule in customRules)
+        {
+            try
+            {
+                // 解析稀有度
+                FishRarityCondition? rarity = null;
+                if (!string.IsNullOrEmpty(customRule.Rarity))
+                {
+                    rarity = FishRarityMapper.GetRarityConditionFromString(customRule.Rarity);
+                }
+
+                // 解析条件
+                var conditions = new List<AFishingCondition>();
+                foreach (var conditionStr in customRule.Conditions)
+                {
+                    var condition = FishingConditionMapper.GetConditionFromString(conditionStr);
+                    if (condition != null)
+                    {
+                        conditions.Add(condition);
+                    }
+                }
+
+                // 创建游戏规则
+                var gameRule = new FishDropRule
+                {
+                    PossibleItems = customRule.PossibleItems.ToArray(),
+                    ChanceNumerator = customRule.ChanceNumerator,
+                    ChanceDenominator = customRule.ChanceDenominator,
+                    Rarity = rarity ?? AFishDropRulePopulator.Rarity.Common,
+                    Conditions = conditions.ToArray()
+                };
+
+                targetList._rules.Add(gameRule);
+                loadedCount++;
+            }
+            catch (Exception ex)
+            {
+                TShock.Log.Error($"加载自定义钓鱼规则失败: {ex.Message}");
+            }
+        }
+
+        return loadedCount;
     }
 }
 

@@ -154,5 +154,33 @@ public partial class AutoFish : TerrariaPlugin
     {
         Config = Configuration.Read();
         Lang.Load(Config.Language);
+        LoadCustomFishRules();
+    }
+
+    /// <summary>
+    ///     从配置加载自定义钓鱼规则。
+    /// </summary>
+    private static void LoadCustomFishRules()
+    {
+        if (Config.CustomFishRules == null || Config.CustomFishRules.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            var loadedCount = Enums.FishDropRuleExporter.LoadCustomRulesToList(
+                Config.CustomFishRules,
+                CustomRuleList);
+
+            if (loadedCount > 0)
+            {
+                TShock.Log.ConsoleInfo($"[AutoFish] 已加载 {loadedCount} 条自定义钓鱼规则");
+            }
+        }
+        catch (Exception ex)
+        {
+            TShock.Log.Error($"[AutoFish] 加载自定义钓鱼规则失败: {ex.Message}");
+        }
     }
 }

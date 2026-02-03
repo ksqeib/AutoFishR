@@ -38,7 +38,7 @@ help.admin.delloot: "[全局] /afa delloot 物品名 -- 移除额外渔获"
 help.admin.stack: "[全局] /afa stack -- 开启丨关闭过滤不可堆叠渔获"
 help.admin.monster: "[全局] /afa monster -- 开启丨关闭不钓怪物"
 help.admin.anim: "[全局] /afa anim -- 开启丨关闭跳过上鱼动画"
-help.admin.export: "[导出] /afa export <页码> -- 导出游戏钓鱼规则（分页）"
+help.admin.export: "[导出] /afa export -- 导出游戏钓鱼规则到 export.yml 文件"
 help.admin.exportstats: "[导出] /afa exportstats -- 查看导出统计信息"
 
 af.promptEnable: "请输入该指令开启→: [c/92C5EC:/af fish]"

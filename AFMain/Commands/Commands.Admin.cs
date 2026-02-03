@@ -97,25 +97,15 @@ public partial class Commands
                 case "exportstats":
                     ExportStatsCommand(caller);
                     return true;
+                case "export":
+                    ExportToFileCommand(caller);
+                    return true;
                 default:
                     return false;
             }
 
         if (args.Parameters.Count == 2)
         {
-            // 处理 export 命令
-            if (sub == "export")
-            {
-                var pageStr = args.Parameters[1];
-                if (!int.TryParse(pageStr, out var page) || page < 1)
-                {
-                    caller.SendErrorMessage(Lang.T("error.invalidPage"));
-                    return true;
-                }
-                ExportCommand(caller, page);
-                return true;
-            }
-
             var matchedItems = TShock.Utils.GetItemByIdOrName(args.Parameters[1]);
             if (matchedItems.Count > 1)
             {
@@ -282,7 +272,7 @@ public partial class Commands
             caller.SendInfoMessage($"完全匹配: {stats.FullyMappedRules} ({GetPercentage(stats.FullyMappedRules, stats.TotalRules)}%)");
             caller.SendInfoMessage($"部分匹配: {stats.PartiallyMappedRules} ({GetPercentage(stats.PartiallyMappedRules, stats.TotalRules)}%)");
             caller.SendInfoMessage($"无法映射: {stats.UnmappedRules} ({GetPercentage(stats.UnmappedRules, stats.TotalRules)}%)");
-            caller.SendInfoMessage($"使用 /afa export <页码> 查看详细规则");
+            caller.SendInfoMessage($"使用 /afa export 导出到文件");
         }
         catch (Exception ex)
         {
@@ -292,80 +282,28 @@ public partial class Commands
     }
 
     /// <summary>
-    ///     导出规则命令（分页显示）。
+    ///     导出规则到文件命令。
     /// </summary>
-    private static void ExportCommand(TSPlayer caller, int page)
+    private static void ExportToFileCommand(TSPlayer caller)
     {
         try
         {
-            var rules = FishDropRuleExporter.ExportRules(skipPartiallyMapped: true);
+            var exportPath = Path.Combine(Configuration.ConfigDirectory, "export.yml");
+            FishDropRuleExporter.ExportToYamlFile(exportPath, skipPartiallyMapped: true);
             
-            if (rules.Count == 0)
-            {
-                caller.SendInfoMessage("没有可导出的完全匹配规则。");
-                return;
-            }
-
-            const int pageSize = 5;
-            var totalPages = (rules.Count + pageSize - 1) / pageSize;
+            var stats = FishDropRuleExporter.GetStatistics();
+            var exportedCount = FishDropRuleExporter.ExportSystemRules(skipPartiallyMapped: true).Count;
             
-            if (page < 1 || page > totalPages)
-            {
-                caller.SendErrorMessage($"页码超出范围！总共 {totalPages} 页。");
-                return;
-            }
-
-            var startIndex = (page - 1) * pageSize;
-            var endIndex = Math.Min(startIndex + pageSize, rules.Count);
-            
-            caller.SendSuccessMessage($"=== 钓鱼规则导出 (第 {page}/{totalPages} 页) ===");
-            
-            for (var i = startIndex; i < endIndex; i++)
-            {
-                var rule = rules[i];
-                var sb = new StringBuilder();
-                
-                sb.Append($"[{i + 1}] 物品: ");
-                if (rule.PossibleItems.Length > 0)
-                {
-                    var itemNames = rule.PossibleItems
-                        .Select(id => TShock.Utils.GetItemById(id)?.Name ?? $"ID:{id}")
-                        .Take(3);
-                    sb.Append(string.Join(", ", itemNames));
-                    if (rule.PossibleItems.Length > 3)
-                        sb.Append($" ...共{rule.PossibleItems.Length}个");
-                }
-                else
-                {
-                    sb.Append("无");
-                }
-                
-                caller.SendInfoMessage(sb.ToString());
-                
-                sb.Clear();
-                sb.Append($"    概率: {rule.ChanceNumerator}/{rule.ChanceDenominator}");
-                if (rule.Rarity.HasValue)
-                    sb.Append($", 稀有度: {rule.Rarity.Value}");
-                caller.SendInfoMessage(sb.ToString());
-                
-                if (rule.Conditions.Count > 0)
-                {
-                    var conditions = string.Join(", ", rule.Conditions.Take(5));
-                    if (rule.Conditions.Count > 5)
-                        conditions += $" ...共{rule.Conditions.Count}个";
-                    caller.SendInfoMessage($"    条件: {conditions}");
-                }
-            }
-            
-            if (page < totalPages)
-            {
-                caller.SendInfoMessage($"使用 /afa export {page + 1} 查看下一页");
-            }
+            caller.SendSuccessMessage($"已成功导出 {exportedCount} 条规则到文件:");
+            caller.SendInfoMessage(exportPath);
+            caller.SendInfoMessage($"总规则数: {stats.TotalRules}");
+            caller.SendInfoMessage($"完全匹配: {stats.FullyMappedRules} ({GetPercentage(stats.FullyMappedRules, stats.TotalRules)}%)");
+            caller.SendInfoMessage($"已导出: {exportedCount} 条完全匹配的规则");
         }
         catch (Exception ex)
         {
-            caller.SendErrorMessage($"导出规则失败: {ex.Message}");
-            TShock.Log.Error($"导出规则失败: {ex}");
+            caller.SendErrorMessage($"导出到文件失败: {ex.Message}");
+            TShock.Log.Error($"导出到文件失败: {ex}");
         }
     }
 

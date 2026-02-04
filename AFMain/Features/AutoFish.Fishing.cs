@@ -158,8 +158,8 @@ public partial class AutoFish
             return; //没抓到，不抬杆
         }
 
-        //设置为收杆状态，没用
-        // hook.ai[0] = 1.0f;
+        //设置为收杆状态
+        hook.ai[0] = 1.0f;
 
         var nowBaitType = (int)hook.localAI[2];
 
@@ -183,84 +183,34 @@ public partial class AutoFish
         // 同步玩家背包
         player.SendData(PacketTypes.PlayerSlot, "", player.Index, locate);
 
-        // 原版给东西的代码，在kill函数，会把ai[1]给玩家
-        // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
-        //New会强制写AI状态，所以Destroy即使调用kill也没有，因为对端没有物品
-        //应该发一个带ai[1]然后直接销毁，就可以触发客户端的收取函数，而不是继续New。
         var origPos = hook.position;
-        //往玩家的二十倍对角方向飞，常规方法无法销毁，粒子动画阻塞
-        var pos = CalcNewPos(player, hook);
-        hook.position = pos;
-        player.SendData(PacketTypes.ProjectileNew, "", hook.whoAmI);
-        //服务器的netMod为2
-
         if (!catchMonster) //抓到怪物触发会导致刷鱼漂，这里是重新设置溅射物
         {
-            spawnHook(player, hook, origPos);
+            SpawnHook(player, hook, origPos);
             //多钩钓鱼代码
             AddMultiHook(player, hook, origPos);
         }
 
+        // 原版给东西的代码，在kill函数，会把ai[1]给玩家
+        // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
+        player.SendData(PacketTypes.ProjectileNew, "", hook.whoAmI);
+        hook.Kill();
+        //服务器的netMod为2
+        
         if (skipFishingAnimation) //跳过上鱼动画
-            player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
-    }
-
-
-    private static FishingContext MyFishingCheck(Projectile hook)
-    {
-        var context = Projectile._context;
-        if (hook.TryBuildFishingContext(context))
         {
-            var num = (context.Fisher.fishingLevel + 75) / 2;
-            if (Main.rand.Next(100) <= num) hook.SetFishingCheckResults(ref context.Fisher);
+            player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
         }
-
-        return context;
     }
 
-
-    private static Vector2 CalcNewPos(TSPlayer player, Projectile hook)
-    {
-        var playerPos = player.TPlayer.position;
-        var hookPos = hook.position;
-
-        var direction = hookPos - playerPos;
-
-        // 3. 获取当前的实际距离
-        var distance = direction.Length();
-
-        // 4. 异常处理：如果距离为0（重合），无法确定方向，直接返回玩家坐标
-        if (distance == 0f) return playerPos;
-
-        // 5. 归一化向量 (Normalize)
-        // 这会将向量的长度变为 1，但方向保持不变。
-        // 这样我们就剥离了“距离”，只保留了“方向”。
-        direction.Normalize();
-
-        // 6. 限制距离范围 (Clamp)
-        // 我们只想要 900 到 3000 之间的长度
-        var targetDistance = distance; // 默认使用原距离
-        if (targetDistance < 900f)
-            targetDistance = 1000f;
-        else if (targetDistance > 3000f) targetDistance = 2000f;
-
-        // 如果在中间，就保持原样不动
-        // 7. 计算最终坐标
-        // 公式：玩家坐标 + (单位方向向量 * 目标距离)
-        var pos = playerPos + direction * targetDistance;
-
-        return pos;
-    }
-
-
-    private static void spawnHook(TSPlayer player, Projectile hook, Vector2 pos)
+    private static void SpawnHook(TSPlayer player, Projectile hook, Vector2 pos, string uuid = "")
     {
         var velocity = new Vector2(0, 0);
         // var pos = new Vector2(hook.position.X, hook.position.Y + 3);
         var index = SpawnProjectile.NewProjectile(
-            Main.projectile[hook.whoAmI].GetProjectileSource_FromThis(),
+            hook.GetProjectileSource_FromThis(),
             pos, velocity, hook.type, 0, 0,
-            hook.owner);
+            player.Index, 0, 0, 0, -1, uuid);
         player.SendData(PacketTypes.ProjectileNew, "", index);
     }
 

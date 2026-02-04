@@ -23,18 +23,7 @@ public partial class AutoFish
         if (hookCount > Config.GlobalMultiHookMaxNum - 1) return;
         if (hookCount > playerData.HookMaxNum - 1) return;
 
-        spawnHookForNew(player, oldHook, pos);
-    }
-
-    public static void spawnHookForNew(TSPlayer player, Projectile hook, Vector2 pos)
-    {
         var guid = Guid.NewGuid().ToString();
-        var velocity = new Vector2(0, 0);
-        // var pos = new Vector2(hook.position.X, hook.position.Y + 3);
-        var index = SpawnProjectile.NewProjectile(
-            Main.projectile[hook.whoAmI].GetProjectileSource_FromThis(),
-            pos, velocity, hook.type, 0, 0,
-            hook.owner, 0, 0, 0, -1, guid);
-        player.SendData(PacketTypes.ProjectileNew, "", index);
+        SpawnHook(player, oldHook, pos, guid);
     }
 }

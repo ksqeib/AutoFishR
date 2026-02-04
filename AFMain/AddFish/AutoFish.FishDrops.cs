@@ -13,33 +13,16 @@ public partial class AutoFish
         Terraria.GameContent.FishDropRules.FishDropRuleList self,
         FishingContext context)
     {
-        return GetMyItemDropType(context);
-    }
-
-    public int GetMyItemDropType(FishingContext context)
-    {
         var resultItemType = 0;
         //我们的
         if (resultItemType == 0 && Config.EnableCustomFishRules)
-            resultItemType = My_TryGetItemDropType(context, CustomRuleList);
+            resultItemType = orig(CustomRuleList, context);
         //原版的
         if (resultItemType == 0 && Config.EnableVanillaFishRules)
-            resultItemType = My_TryGetItemDropType(context, FishingConditionMapper.SystemRuleList);
+            resultItemType = orig(FishingConditionMapper.SystemRuleList, context);
         return resultItemType;
     }
-
-    public int My_TryGetItemDropType(FishingContext context, FishDropRuleList ruleList) //没这个会导致无限递归
-    {
-        int resultItemType = 0;
-        for (int index = 0; index < ruleList._rules.Count; ++index)
-        {
-            if (ruleList._rules[index].Attempt(context, out resultItemType))
-                return resultItemType;
-        }
-
-        return 0;
-    }
-
+    
     //注册上去，做一个自己的RuleList就好了
     public void RegisterToFishDB()
     {

@@ -17,6 +17,9 @@ internal class Configuration
     /// <summary>配置文件路径。</summary>
     public static readonly string FilePath = Path.Combine(ConfigDirectory, "config.yml");
 
+    /// <summary>是否首次生成配置文件（仅本次运行内有效）。</summary>
+    internal static bool IsFirstInstall { get; private set; }
+
     private static readonly IDeserializer Deserializer = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .IgnoreUnmatchedProperties()
@@ -167,6 +170,8 @@ internal class Configuration
             Console.WriteLine("[AutoFish]配置文件成功找到并加载");
             return;
         }
+
+        IsFirstInstall = true;
 
         var preferredCulture = ResolvePreferredConfigCulture();
         if (TryExportEmbeddedConfig(preferredCulture))

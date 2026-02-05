@@ -46,6 +46,8 @@ firstFishHint: "检测到你正在钓鱼，可使用 /af fish 开启自动钓鱼
 reload.done: "[自动钓鱼]重新加载配置完毕。"
 
 error.invalidPage: "页码必须是大于 0 的整数！"
+error.noBait: "没有鱼饵了！"
+error.autoFishStopped: "自动钓鱼已停止，请补充鱼饵后重新抛竿。"
 
 status.title: "[自动钓鱼个人状态]"
 status.autofish: "功能：{0}"

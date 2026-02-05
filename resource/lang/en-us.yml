@@ -44,6 +44,8 @@ firstFishHint: "Detected you are fishing; use /af fish to enable AutoFish."
 reload.done: "[AutoFish] Configuration reloaded."
 
 error.invalidPage: "Page number must be a positive integer!"
+error.noBait: "Out of bait!"
+error.autoFishStopped: "Auto fishing stopped. Please recast after refilling bait."
 
 status.title: "[AutoFish Personal Status]"
 status.autofish: "Feature: {0}"

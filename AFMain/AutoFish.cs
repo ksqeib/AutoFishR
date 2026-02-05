@@ -15,6 +15,9 @@ public partial class AutoFish : TerrariaPlugin
     public const string CommonPermission = $"{PermissionPrefix}common";
     public const string DenyPermissionPrefix = $"{PermissionPrefix}no.";
 
+    /// <summary>DEBUG 模式开关。</summary>
+    internal static bool DebugMode = false;
+
     /// <summary>全局配置实例。</summary>
     internal static Configuration Config = new();
 
@@ -35,7 +38,7 @@ public partial class AutoFish : TerrariaPlugin
     public override string Author => "ksqeib 羽学 少司命";
 
     /// <summary>插件版本。</summary>
-    public override Version Version => new(1, 4, 8);
+    public override Version Version => new(1, 4, 8, 1);
 
     /// <summary>插件描述。</summary>
     public override string Description => "青山常伴绿水，燕雀已是南飞";
@@ -111,6 +114,7 @@ public partial class AutoFish : TerrariaPlugin
     {
         LoadConfig();
         GeneralHooks.ReloadEvent += ReloadConfig;
+        ServerApi.Hooks.GamePostInitialize.Register(this, OnGamePostInitialize);
         //容易出bug，还是OTAPI精准打击吧
         // ServerApi.Hooks.ProjectileAIUpdate.Register(this, ProjectAiUpdate);
         Projectile.AI_061_FishingBobber += OnAI_061_FishingBobber;
@@ -121,6 +125,44 @@ public partial class AutoFish : TerrariaPlugin
     }
 
     /// <summary>
+    ///     服务器初始化后显示插件状态信息。
+    /// </summary>
+    private void OnGamePostInitialize(EventArgs args)
+    {
+        // 检查 SSC 是否开启
+        if (!Main.ServerSideCharacter)
+        {
+            TShock.Log.ConsoleError("========================================");
+            TShock.Log.ConsoleError("[AutoFishR] 严重错误：SSC 未开启！");
+            TShock.Log.ConsoleError("[AutoFishR] 本插件需要 ServerSideCharacter 才能正常运行");
+            TShock.Log.ConsoleError("[AutoFishR] 请在 tshock/sscconfig.json 中启用 SSC");
+            TShock.Log.ConsoleError("[AutoFishR] 若将此错误截图到群里，请群友代开发者问候截图者");
+            TShock.Log.ConsoleError("[AutoFishR] 插件已自动禁用");
+            TShock.Log.ConsoleError("========================================");
+
+            // 注销所有钩子和命令，禁用插件
+            Dispose(true);
+            return;
+        }
+
+        if (!Configuration.IsFirstInstall) return;
+
+        TShock.Log.ConsoleInfo("========================================");
+        TShock.Log.ConsoleInfo($"[AutoFishR] 插件已成功加载 v{Version}");
+        TShock.Log.ConsoleInfo("[AutoFishR] 当前状态：正常运行");
+        TShock.Log.ConsoleInfo("========================================");
+        TShock.Log.ConsoleInfo("[AutoFishR] 遇到 BUG 或问题？");
+        TShock.Log.ConsoleInfo("[AutoFishR] 1. 请先查看 README 文档");
+        TShock.Log.ConsoleInfo("[AutoFishR] 2. 无法解决再联系开发者");
+        TShock.Log.ConsoleInfo("[AutoFishR] GitHub: https://github.com/ksqeib/AutoFishR");
+        TShock.Log.ConsoleInfo("[AutoFishR] Star 很重要，是支持开发者持续开发的动力，欢迎点个 Star！");
+        TShock.Log.ConsoleInfo("[AutoFishR] 本插件为免费开源插件，如有任何付费购买行为，说明您被骗了。");
+        TShock.Log.ConsoleInfo("[AutoFishR] 联系方式：QQ 2388990095 (ksqeib)");
+        TShock.Log.ConsoleInfo("[AutoFishR] 警告：请勿在群内艾特开发者！");
+        TShock.Log.ConsoleInfo("========================================");
+    }
+
+    /// <summary>
     ///     释放插件，注销事件与命令。
     /// </summary>
     protected override void Dispose(bool disposing)
@@ -128,6 +170,7 @@ public partial class AutoFish : TerrariaPlugin
         if (disposing)
         {
             GeneralHooks.ReloadEvent -= ReloadConfig;
+            ServerApi.Hooks.GamePostInitialize.Deregister(this, OnGamePostInitialize);
             // ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, ProjectAiUpdate);
             Projectile.AI_061_FishingBobber -= OnAI_061_FishingBobber;
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afs);

@@ -21,16 +21,48 @@ public partial class AutoFish
     /// </summary>
     private void HookUpdate(Projectile hook)
     {
-        if (hook.owner < 0) return;
-        if (hook.owner > Main.maxPlayers) return;
-        if (!hook.active) return;
-        if (!hook.bobber) return;
-        if (!Config.PluginEnabled) return;
-        if (!Config.GlobalAutoFishFeatureEnabled) return;
+        if (hook.owner < 0)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook.owner < 0");
+            return;
+        }
+        if (hook.owner > Main.maxPlayers)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook.owner > Main.maxPlayers");
+            return;
+        }
+        if (!hook.active)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook is not active");
+            return;
+        }
+        if (!hook.bobber)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook is not bobber");
+            return;
+        }
+        if (!Config.PluginEnabled)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Plugin not enabled");
+            return;
+        }
+        if (!Config.GlobalAutoFishFeatureEnabled)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Global auto fish feature not enabled");
+            return;
+        }
 
         var player = TShock.Players[hook.owner];
-        if (player == null) return;
-        if (!player.Active) return;
+        if (player == null)
+        {
+            if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Player is null (owner: {hook.owner})");
+            return;
+        }
+        if (!player.Active)
+        {
+            if (DebugMode) player.SendInfoMessage($"[DEBUG] Player not active");
+            return;
+        }
 
         var skipNonStackableLoot = Config.GlobalSkipNonStackableLoot &&
                                    HasFeaturePermission(player, "filter.unstackable");
@@ -48,8 +80,16 @@ public partial class AutoFish
         //初次钓鱼提醒和未开启返回
         if (!playerData.AutoFishEnabled)
         {
-            if (!HasFeaturePermission(player, "fish")) return;
-            if (playerData.FirstFishHintShown) return;
+            if (!HasFeaturePermission(player, "fish"))
+            {
+                if (DebugMode) player.SendInfoMessage($"[DEBUG] No permission for fish feature");
+                return;
+            }
+            if (playerData.FirstFishHintShown)
+            {
+                if (DebugMode) player.SendInfoMessage($"[DEBUG] First fish hint already shown, auto fish not enabled");
+                return;
+            }
             playerData.FirstFishHintShown = true;
             player.SendInfoMessage(Lang.T("firstFishHint"));
             return;
@@ -62,10 +102,20 @@ public partial class AutoFish
         protectValuableBait &= playerData.ProtectValuableBaitEnabled;
 
         //负数时候为咬钩倒计时，说明上鱼了
-        if (!(hook.ai[1] < 0)) return;
+        if (!(hook.ai[1] < 0))
+        {
+            // if (DebugMode) player.SendInfoMessage($"[DEBUG] Fish not hooked yet (ai[1]: {hook.ai[1]:F2})");
+            return;
+        }
 
         player.TPlayer.Fishing_GetBait(out var baitPower, out var baitType);
-        if (baitType == 0) return; //没有鱼饵，不要继续
+        if (baitType == 0) //没有鱼饵，不要继续
+        {
+            player.SendErrorMessage(Lang.T("error.noBait"));
+            player.SendInfoMessage(Lang.T("error.autoFishStopped"));
+            ResetHook(hook);
+            return;
+        }
 
         // 保护贵重鱼饵：将其移到背包末尾以避免被消耗
         if (protectValuableBait && Config.ValuableBaitItemIds.Contains(baitType))
@@ -154,6 +204,7 @@ public partial class AutoFish
 
         if (noCatch)
         {
+            if (DebugMode) player.SendInfoMessage($"[DEBUG] No catch after {dropLimit} attempts");
             ResetHook(hook);
             return; //没抓到，不抬杆
         }
@@ -169,11 +220,16 @@ public partial class AutoFish
             out var baitUsed);
         if (nowBaitType != baitUsed)
         {
+            if (DebugMode) player.SendInfoMessage($"[DEBUG] Bait mismatch: now={nowBaitType}, used={baitUsed}");
             player.SendMessage("鱼饵不一致", Colors.CurrentLiquidColor);
             return;
         }
 
-        if (!pull) return; //说明鱼饵没了，不能继续，否则可能会卡bug
+        if (!pull)
+        {
+            if (DebugMode) player.SendInfoMessage($"[DEBUG] Cannot pull, bait may be depleted");
+            return; //说明鱼饵没了，不能继续，否则可能会卡bug
+        }
         //Buff更新
         if (playerData.BuffEnabled)
             BuffUpdate(player);

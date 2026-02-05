@@ -32,6 +32,7 @@ public partial class Commands
         helpMessage.Append('\n').Append(Lang.T("help.admin.anim"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.export"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.exportstats"));
+        helpMessage.Append('\n').Append("  /afa debug - 切换 DEBUG 模式");
     }
 
     private static bool HandleAdminCommand(CommandArgs args)
@@ -97,6 +98,20 @@ public partial class Commands
                     return true;
                 case "export":
                     ExportToFileCommand(caller);
+                    return true;
+                case "debug":
+                    AutoFish.DebugMode = !AutoFish.DebugMode;
+                    var debugStatus = AutoFish.DebugMode ? "[c/00FF00:已开启]" : "[c/FF0000:已关闭]";
+                    caller.SendSuccessMessage($"DEBUG 模式 {debugStatus}");
+                    if (AutoFish.DebugMode)
+                    {
+                        caller.SendInfoMessage("[c/FFFF00:警告：DEBUG 模式会输出大量调试信息到控制台]");
+                        TShock.Log.ConsoleInfo($"[AutoFishR] DEBUG 模式已开启 (操作者: {caller.Name})");
+                    }
+                    else
+                    {
+                        TShock.Log.ConsoleInfo($"[AutoFishR] DEBUG 模式已关闭 (操作者: {caller.Name})");
+                    }
                     return true;
                 default:
                     return false;

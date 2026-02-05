@@ -32,7 +32,7 @@ public class Tools
 
         if (currentSlot == -1) return false;
 
-        // 优先选择末尾的非贵重鱼饵，找不到时才回退到任何末尾鱼饵。
+        // 仅选择末尾的非贵重鱼饵，找不到则返回 false，避免反复交换贵重鱼饵。
         for (var i = inv.Length - 1; i >= 0; i--)
         {
             if (inv[i].bait <= 0) continue;
@@ -41,15 +41,6 @@ public class Tools
             targetItemType = inv[i].type;
             break;
         }
-
-        if (targetSlot == -1)
-            for (var i = inv.Length - 1; i >= 0; i--)
-            {
-                if (inv[i].bait <= 0 || i == currentSlot) continue;
-                targetSlot = i;
-                targetItemType = inv[i].type;
-                break;
-            }
 
         if (targetSlot == -1 || targetSlot == currentSlot) return false;
 

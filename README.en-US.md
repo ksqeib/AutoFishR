@@ -84,13 +84,12 @@ See [resource/config/zh-cn.yml](resource/config/zh-cn.yml) or [resource/config/e
 1. **Check plugin master switch**: ensure `pluginEnabled` is `true` in config.
 2. **Check global feature switch**: ensure `globalAutoFishFeatureEnabled` is `true`.
 3. **Check permissions**: player needs `autofish` and the feature permission (or `autofish.common`). `autofish.no.<feature>` forces denial.
-4. **Check rules**: for complex behavior, ensure `enableVanillaFishRules` is enabled; if using custom rules, verify `enableCustomFishRules` and rule content are valid.
-5. **Check consumption mode**: if enabled, make sure exchange rules exist and the player has remaining duration.
-6. **Check valuable bait protection**: it swaps bait to protect it. If issues occur, try disabling it with `/af bait`.
-7. **Check bait**: without bait, auto fishing stops; refill and recast.
-8. **Ensure SSC is enabled**: the plugin requires ServerSideCharacter to work properly.
-9. **Enable debug**: admins run `/afa debug` to toggle debug mode.
-10. **Reproduce and capture**: reproduce the fishing issue and keep screenshots of chat hints and console output for reporting.
+4. **Check consumption mode**: if enabled, make sure exchange rules exist and the player has remaining duration.
+5. **Check valuable bait protection**: it swaps bait to protect it. If issues occur, try disabling it with `/af bait`.
+6. **Check bait**: without bait, auto fishing stops; refill and recast.
+7. **Ensure SSC is enabled**: the plugin requires ServerSideCharacter to work properly.
+8. **Enable debug**: admins run `/afa debug` to toggle debug mode.
+9. **Reproduce and capture**: reproduce the fishing issue and keep screenshots of chat hints and console output for reporting.
 
 ## Mechanics (Behavior and Key Logic)
 

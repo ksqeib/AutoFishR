@@ -120,15 +120,6 @@ internal class Configuration
         2895 // 金蠕虫
     };
 
-    /// <summary>启用自定义钓鱼规则。</summary>
-    public bool EnableCustomFishRules { get; set; } = true;
-
-    /// <summary>启用原版钓鱼规则。</summary>
-    public bool EnableVanillaFishRules { get; set; } = true;
-
-    /// <summary>自定义钓鱼规则列表。</summary>
-    public List<CustomFishDropRule> CustomFishRules { get; set; } = new();
-
     /// <summary>Buff ID 与持续秒数映射。</summary>
     public Dictionary<int, int> BuffDurations { get; set; } = new();
 
@@ -239,24 +230,4 @@ public class BaitReward
 
     /// <summary>兑换的时长（分钟）。</summary>
     public int Minutes { get; set; }
-}
-/// <summary>
-///     自定义钓鱼掉落规则（用于配置文件）。
-/// </summary>
-public class CustomFishDropRule
-{
-    /// <summary>可能掉落的物品 ID 列表</summary>
-    public List<int> PossibleItems { get; set; } = new();
-
-    /// <summary>概率分子</summary>
-    public int ChanceNumerator { get; set; } = 1;
-
-    /// <summary>概率分母</summary>
-    public int ChanceDenominator { get; set; } = 1;
-
-    /// <summary>稀有度类型字符串</summary>
-    public string? Rarity { get; set; }
-
-    /// <summary>钓鱼条件类型列表</summary>
-    public List<string> Conditions { get; set; } = new();
 }

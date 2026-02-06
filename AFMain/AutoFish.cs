@@ -121,7 +121,6 @@ public partial class AutoFish : TerrariaPlugin
         TShockAPI.Commands.ChatCommands.Add(new Command(new List<string> { "autofish", CommonPermission },
             Commands.Afs, "af", "autofish"));
         TShockAPI.Commands.ChatCommands.Add(new Command(AdminPermission, Commands.Afa, "afa", "autofishadmin"));
-        RegisterToFishDB();
     }
 
     /// <summary>
@@ -175,7 +174,6 @@ public partial class AutoFish : TerrariaPlugin
             Projectile.AI_061_FishingBobber -= OnAI_061_FishingBobber;
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afs);
             TShockAPI.Commands.ChatCommands.RemoveAll(x => x.CommandDelegate == Commands.Afa);
-            UnRegisterToFishDB();
         }
 
         base.Dispose(disposing);
@@ -197,36 +195,6 @@ public partial class AutoFish : TerrariaPlugin
     {
         Config = Configuration.Read();
         Lang.Load(Config.Language);
-        LoadCustomFishRules();
     }
 
-    /// <summary>
-    ///     从配置加载自定义钓鱼规则。
-    /// </summary>
-    private static void LoadCustomFishRules()
-    {
-        // 清空现有的自定义规则列表
-        CustomRuleList._rules.Clear();
-
-        if (Config.CustomFishRules == null || Config.CustomFishRules.Count == 0)
-        {
-            return;
-        }
-
-        try
-        {
-            var loadedCount = Enums.FishDropRuleExporter.LoadCustomRulesToList(
-                Config.CustomFishRules,
-                CustomRuleList);
-
-            if (loadedCount > 0)
-            {
-                TShock.Log.ConsoleInfo($"[AutoFish] 已加载 {loadedCount} 条自定义钓鱼规则");
-            }
-        }
-        catch (Exception ex)
-        {
-            TShock.Log.Error($"[AutoFish] 加载自定义钓鱼规则失败: {ex.Message}");
-        }
-    }
 }

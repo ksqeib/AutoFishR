@@ -44,10 +44,6 @@ baitRewards:
     count: 1
     minutes: 5
 
-# Filter non-stackable loot: drop items with maxStack==1 and re-roll the catch.
-globalSkipNonStackableLoot: true
-defaultSkipNonStackableLoot: true
-
 # Block monsters: when catchId<0 drop and re-roll.
 globalBlockMonsterCatch: true
 defaultBlockMonsterCatch: true

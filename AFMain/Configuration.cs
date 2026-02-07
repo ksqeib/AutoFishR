@@ -74,12 +74,6 @@ internal class Configuration
         { 3194, new BaitReward { Count = 1, Minutes = 5 } } // 蝗虫
     };
 
-    /// <summary>全局跳过不可堆叠渔获。</summary>
-    public bool GlobalSkipNonStackableLoot { get; set; } = true;
-
-    /// <summary>玩家默认是否跳过不可堆叠渔获。</summary>
-    public bool DefaultSkipNonStackableLoot { get; set; } = true;
-
     /// <summary>全局禁止钓上怪物。</summary>
     public bool GlobalBlockMonsterCatch { get; set; } = true;
 

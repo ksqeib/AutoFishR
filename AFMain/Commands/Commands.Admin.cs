@@ -26,7 +26,6 @@ public partial class Commands
             helpMessage.Append('\n').Append(Lang.T("help.admin.del"));
         }
 
-        helpMessage.Append('\n').Append(Lang.T("help.admin.stack"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.monster"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.anim"));
         helpMessage.Append('\n').Append(Lang.T("help.admin.export"));
@@ -66,14 +65,6 @@ public partial class Commands
                         ? "common.enabledVerb"
                         : "common.disabledVerb");
                     caller.SendSuccessMessage(Lang.T("success.toggle.consumption", caller.Name, modToggle));
-                    AutoFish.Config.Write();
-                    return true;
-                case "stack":
-                    AutoFish.Config.GlobalSkipNonStackableLoot = !AutoFish.Config.GlobalSkipNonStackableLoot;
-                    caller.SendSuccessMessage(Lang.T("success.toggle.globalStack",
-                        Lang.T(AutoFish.Config.GlobalSkipNonStackableLoot
-                            ? "common.enabledVerb"
-                            : "common.disabledVerb")));
                     AutoFish.Config.Write();
                     return true;
                 case "monster":

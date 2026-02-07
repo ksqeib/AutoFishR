@@ -64,8 +64,6 @@ public partial class AutoFish
             return;
         }
 
-        var skipNonStackableLoot = Config.GlobalSkipNonStackableLoot &&
-                                   HasFeaturePermission(player, "filter.unstackable");
         var blockMonsterCatch = Config.GlobalBlockMonsterCatch &&
                                 HasFeaturePermission(player, "filter.monster");
         var skipFishingAnimation = Config.GlobalSkipFishingAnimation &&
@@ -95,7 +93,6 @@ public partial class AutoFish
             return;
         }
 
-        skipNonStackableLoot &= playerData.SkipNonStackableLoot;
         blockMonsterCatch &= playerData.BlockMonsterCatch;
         skipFishingAnimation &= playerData.SkipFishingAnimation;
         blockQuestFish &= playerData.BlockQuestFish;
@@ -186,14 +183,6 @@ public partial class AutoFish
             {
                 catchItem = true;
                 noCatch = false;
-            }
-
-            //抓到物品
-            if (catchItem && skipNonStackableLoot) //不想抓不可堆叠堆叠物品
-            {
-                var item = new Item();
-                item.SetDefaults((int)catchId);
-                if (item.maxStack == 1) continue;
             }
 
             if (noCatch) continue; //真没抓到

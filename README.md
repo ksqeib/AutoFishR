@@ -22,7 +22,7 @@ Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外
 
 - 管理员全通: `autofish.admin`。
 - 通用白名单: `autofish.common`，拥有它即可使用全部玩家指令（仍受全局开关与负权限影响）。
-- 功能权限: `autofish.<feature>`，示例 `autofish.fish`、`autofish.multihook`、`autofish.filter.unstackable` 等。
+- 功能权限: `autofish.<feature>`，示例 `autofish.fish`、`autofish.multihook` 等。
 - 负权限: `autofish.no.<feature>`，拥有该权限即强制无权限（除 admin 外），示例 `autofish.no.fish`。
 - `/af` 命令本身需要 `autofish`；拥有 `autofish.common` 等同可用全部玩家指令。
 
@@ -39,7 +39,6 @@ Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外
 | /af buff | 开/关钓鱼 Buff | autofish.buff | 全局 Buff 开启 |
 | /af multi | 开/关多钩 | autofish.multihook | 全局多钩开启 |
 | /af hook 数字 | 设置个人钩子上限 | autofish.multihook | 全局多钩开启，数值 ≤ 全局上限 |
-| /af stack | 开/关过滤不可堆叠 | autofish.filter.unstackable | 全局过滤开启 |
 | /af monster | 开/关不钓怪物 | autofish.filter.monster | 全局不钓怪开启 |
 | /af anim | 开/关跳过上鱼动画 | autofish.skipanimation | 全局动画跳过开启 |
 | /af list | 查看消耗模式指定物品 | autofish | 全局消耗模式开启 |
@@ -66,7 +65,6 @@ Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外
 | /afa del 物品名 | 移除指定鱼饵（消耗模式开启时可见） |
 | /afa addloot 物品名 | 添加额外渔获 |
 | /afa delloot 物品名 | 移除额外渔获 |
-| /afa stack | 全局开/关过滤不可堆叠渔获 |
 | /afa monster | 全局开/关不钓怪物 |
 | /afa anim | 全局开/关跳过上鱼动画 |
 
@@ -78,7 +76,7 @@ Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外
 
 - `/af` 对普通玩家最简做法：给组添加 `autofish.common` 即可；若要禁用某功能，额外赋予对应 `autofish.no.<feature>`。
 - 启用消耗模式后，个人需要拥有消耗时长；插件会在缺少鱼饵时直接返回。
-- 多钩/过滤/不钓怪/跳过动画等均受“全局开关 + 个人开关 + 权限”共同约束。
+- 多钩/不钓怪/跳过动画等均受“全局开关 + 个人开关 + 权限”共同约束。
 
 ## 排错指南
 
@@ -94,11 +92,10 @@ Tshock 服务器自动钓鱼插件，支持自动收杆、多钩、Buff、额外
 
 ## 原理（功能行为与关键逻辑）
 
-- 自动钓鱼：在浮漂 AI 更新时检测 `bobber.ai[1] < 0`（已上钩），扣除鱼饵、调用原版收杆逻辑，再重发弹幕；若配置开启额外渔获/过滤怪物/过滤不可堆叠，会在生成掉落前执行筛选与替换。
+- 自动钓鱼：在浮漂 AI 更新时检测 `bobber.ai[1] < 0`（已上钩），扣除鱼饵、调用原版收杆逻辑，再重发弹幕；若配置开启额外渔获/过滤怪物，会在生成掉落前执行筛选与替换。
 - 多钩：在生成鱼线弹幕事件中统计当前浮漂数量，未超出上限时为玩家复制一枚新的鱼线弹幕，实现并行钓鱼；同时受消耗模式与玩家多钩开关限制。
 - 跳过上鱼动画：收杆后直接向客户端发送 `ProjectileDestroy`，省略动画。
 - 不钓怪物：当判定结果为怪物（catchId < 0）且开启该功能时，丢弃结果重新尝试。
-- 过滤不可堆叠：当掉落物 maxStack==1 且过滤开启时丢弃结果重新尝试。
 - 保护贵重鱼饵：检测当前使用的鱼饵是否在贵重列表中，如是则尝试与背包尾部的鱼饵位置交换，并同步槽位，避免被扣除。
 - 消耗模式：全局开启时，玩家需个人开启且有剩余时长才执行自动钓鱼/多钩；剩余时长通过玩家消耗指定物品兑换（指令与逻辑同前述配置字段）。
 - Buff：当检测到玩家鱼线存在且全局/个人 Buff 开启时，为玩家施加 `Buff表` 配置的 Buff（ID+持续时间）。

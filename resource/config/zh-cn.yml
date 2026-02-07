@@ -44,10 +44,6 @@ baitRewards:
     count: 1
     minutes: 5
 
-# 过滤不可堆叠渔获：开启后丢弃 maxStack==1 的掉落，重新判定。
-globalSkipNonStackableLoot: true
-defaultSkipNonStackableLoot: true
-
 # 不钓怪物：catchId<0 时丢弃重新判定。
 globalBlockMonsterCatch: true
 defaultBlockMonsterCatch: true

@@ -28,10 +28,6 @@ public partial class Commands
             helpMessage.Append('\n').Append(Lang.T("help.player.hook"));
         }
 
-        if (AutoFish.Config.GlobalSkipNonStackableLoot &&
-            AutoFish.HasFeaturePermission(player, "filter.unstackable"))
-            helpMessage.Append('\n').Append(Lang.T("help.player.stack"));
-
         if (AutoFish.Config.GlobalBlockMonsterCatch && AutoFish.HasFeaturePermission(player, "filter.monster"))
             helpMessage.Append('\n').Append(Lang.T("help.player.monster"));
 
@@ -110,25 +106,6 @@ public partial class Commands
                     return true;
                 case "status":
                     SendStatus(args.Player, playerData);
-                    return true;
-                case "stack":
-                    if (!AutoFish.Config.GlobalSkipNonStackableLoot)
-                    {
-                        args.Player.SendWarningMessage(Lang.T("warn.stackDisabled"));
-                        return true;
-                    }
-
-                    if (!AutoFish.HasFeaturePermission(player, "filter.unstackable"))
-                    {
-                        args.Player.SendErrorMessage(Lang.T("error.noPermission.stack"));
-                        return true;
-                    }
-
-                    playerData.SkipNonStackableLoot = !playerData.SkipNonStackableLoot;
-                    var stackVerb = Lang.T(playerData.SkipNonStackableLoot
-                        ? "common.enabledVerb"
-                        : "common.disabledVerb");
-                    args.Player.SendSuccessMessage(Lang.T("success.toggle.stack", args.Player.Name, stackVerb));
                     return true;
                 case "monster":
                     if (!AutoFish.Config.GlobalBlockMonsterCatch)

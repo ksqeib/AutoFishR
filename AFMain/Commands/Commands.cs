@@ -95,9 +95,6 @@ public partial class Commands
         if (playerData.MultiHookEnabled)
             enabledFeatures.Add(Lang.T("status.multihook", Lang.T("common.enabled"), playerData.HookMaxNum));
 
-        if (playerData.SkipNonStackableLoot)
-            enabledFeatures.Add(Lang.T("status.skipUnstackable", Lang.T("common.enabled")));
-
         if (playerData.BlockMonsterCatch)
             enabledFeatures.Add(Lang.T("status.blockMonster", Lang.T("common.enabled")));
 

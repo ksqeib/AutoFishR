@@ -21,31 +21,41 @@ public partial class AutoFish
     /// </summary>
     private void HookUpdate(Projectile hook)
     {
+
+        if (hook.ai[0] >= 1f)
+        {//正在收杆的
+            return;
+        }
         if (hook.owner < 0)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook.owner < 0");
             return;
         }
+
         if (hook.owner > Main.maxPlayers)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook.owner > Main.maxPlayers");
             return;
         }
+
         if (!hook.active)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook is not active");
             return;
         }
+
         if (!hook.bobber)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] hook is not bobber");
             return;
         }
+
         if (!Config.PluginEnabled)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Plugin not enabled");
             return;
         }
+
         if (!Config.GlobalAutoFishFeatureEnabled)
         {
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Global auto fish feature not enabled");
@@ -58,6 +68,7 @@ public partial class AutoFish
             if (DebugMode) TShock.Log.ConsoleInfo($"[AutoFishR-DEBUG] Player is null (owner: {hook.owner})");
             return;
         }
+
         if (!player.Active)
         {
             if (DebugMode) player.SendInfoMessage($"[DEBUG] Player not active");
@@ -83,11 +94,13 @@ public partial class AutoFish
                 if (DebugMode) player.SendInfoMessage($"[DEBUG] No permission for fish feature");
                 return;
             }
+
             if (playerData.FirstFishHintShown)
             {
                 if (DebugMode) player.SendInfoMessage($"[DEBUG] First fish hint already shown, auto fish not enabled");
                 return;
             }
+
             playerData.FirstFishHintShown = true;
             player.SendInfoMessage(Lang.T("firstFishHint"));
             return;
@@ -219,6 +232,7 @@ public partial class AutoFish
             if (DebugMode) player.SendInfoMessage($"[DEBUG] Cannot pull, bait may be depleted");
             return; //说明鱼饵没了，不能继续，否则可能会卡bug
         }
+
         //Buff更新
         if (playerData.BuffEnabled)
             BuffUpdate(player);
@@ -239,9 +253,8 @@ public partial class AutoFish
         // 原版给东西的代码，在kill函数，会把ai[1]给玩家
         // 这里发的是连续弹幕 避免线断 因为弹幕是不需要玩家物理点击来触发收杆的，但是服务端和客户端概率测算不一样，会导致服务器扣了饵料，但是客户端没扣
         player.SendData(PacketTypes.ProjectileNew, "", hook.whoAmI);
-        hook.Kill();
         //服务器的netMod为2
-        
+
         if (skipFishingAnimation) //跳过上鱼动画
         {
             player.SendData(PacketTypes.ProjectileDestroy, "", hook.whoAmI);
